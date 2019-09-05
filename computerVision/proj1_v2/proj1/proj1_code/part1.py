@@ -32,19 +32,13 @@ def create_Gaussian_kernel(cutoff_frequency):
   k = (cutoff_frequency *4) + 1
   mean = math.floor(k / 2)
   stdev = cutoff_frequency
-
   kern1dim = []
-  for i in range(-k, k+1):
-    prob = np.exp(((-i - mean) ^ 2)/(2*stdev)) / np.sqrt(2*np.pi*stdev*stdev)
+  for i in range(k):
+    prob =  (np.exp(-( (i-mean)**2 / (2*stdev**2) ) ) / np.sqrt(2*np.pi*stdev))
     kern1dim.append(prob)
   
   kernel = np.outer(kern1dim, kern1dim)
-
-
-      
-
-  #raise NotImplementedError('`create_Gaussian_kernel` function in '
-   # + '`student_code.py` needs to be implemented')
+  kernel = (1/ np.sum(kernel)) * kernel
 
   ### END OF STUDENT CODE ####
   ############################
