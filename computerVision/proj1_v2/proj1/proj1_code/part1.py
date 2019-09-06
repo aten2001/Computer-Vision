@@ -81,7 +81,7 @@ def my_imfilter(image, filter):
     for i in range(image.shape[0]):
       for j in range(image.shape[1]):
         kernel = padded[i:i+filter.shape[0], j:j+filter.shape[1],channel]
-        filtered_img[i:i+1, j:j+1, channel] = np.sum((np.multiply(kernel, filter)), axis=(0,1))
+        filtered_img[i, j, channel] = np.sum((np.multiply(kernel, filter)), axis=(0,1))
   
   return filtered_img
 
