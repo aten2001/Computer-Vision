@@ -34,8 +34,11 @@ def make_dataset(path: str) -> Tuple[List[str],List[str]]:
   ############################
   ### TODO: YOUR CODE HERE ###
 
-  raise NotImplementedError('`make_dataset` function in `datasets.py` needs '
-    + 'to be implemented')
+  # Path = ../cutoff_frequencies.txt
+
+  print(path)
+  images_a = None
+  images_b = None
 
   ### END OF STUDENT CODE ####
   ############################
@@ -60,9 +63,11 @@ def get_cutoff_frequencies(path: str) -> List[int]:
 
   ############################
   ### TODO: YOUR CODE HERE ###
+  
+  # Path = ../data
 
-  raise NotImplementedError('`get_cutoff_frequencies` function in '
-    + '`datasets.py` needs to be implemented')
+  print(path)
+  cutoff_frequencies = None
 
   ### END OF STUDENT CODE ####
   ############################
