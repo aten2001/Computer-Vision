@@ -69,14 +69,25 @@ def my_imfilter(image, filter):
 
   ############################
   ### TODO: YOUR CODE HERE ###
+  num_channels = image.shape[2]
 
-  raise NotImplementedError('`my_imfilter` function in `student_code.py` ' +
-    'needs to be implemented')
+  height_filter = filter.shape[0]
+  width_filter = filter.shape[1]
+
+  padded = np.pad(image, ((height_filter // 2 , ),(width_filter // 2,),(0,)), 'constant', constant_values=0 )
+  filtered_img = np.zeros((image.shape[0], image.shape[1], num_channels))
+
+  for channel in range(num_channels):
+    for i in range(image.shape[0]):
+      for j in range(image.shape[1]):
+        kernel = padded[i:i+filter.shape[0], j:j+filter.shape[1],channel]
+        filtered_img[i:i+1, j:j+1, channel] = np.sum((np.multiply(kernel, filter)), axis=(0,1))
+  
+  return filtered_img
+
 
   ### END OF STUDENT CODE ####
   ############################
-
-  return filtered_image
 
 def create_hybrid_image(image1, image2, filter):
   """
@@ -114,8 +125,12 @@ def create_hybrid_image(image1, image2, filter):
   ############################
   ### TODO: YOUR CODE HERE ###
 
-  raise NotImplementedError('`create_hybrid_image` function in ' +
-    '`student_code.py` needs to be implemented')
+
+  low_frequencies = my_imfilter(image1, filter)
+  high_frequencies = image2 - my_imfilter(image2, filter)
+  hybrid_image =  np.add(high_frequencies, low_frequencies)
+  hybrid_image = np.clip(hybrid_image, 0 , 1)
+  
 
   ### END OF STUDENT CODE ####
   ############################
