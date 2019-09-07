@@ -10,6 +10,7 @@ import PIL
 import torch
 import torch.utils.data as data
 import torchvision.transforms as transforms
+import glob
 
 from typing import List, Tuple
 
@@ -36,9 +37,15 @@ def make_dataset(path: str) -> Tuple[List[str],List[str]]:
 
   # Path = ../cutoff_frequencies.txt
 
-  print(path)
-  images_a = None
-  images_b = None
+  img_list = glob.glob(path + '/*')
+  images_a = []
+  images_b = []
+
+  for img_name in img_list:
+    if "a_" in img_name:
+      images_a.append(img_name)
+    else:
+      images_b.append(img_name)
 
   ### END OF STUDENT CODE ####
   ############################
@@ -65,13 +72,14 @@ def get_cutoff_frequencies(path: str) -> List[int]:
   ### TODO: YOUR CODE HERE ###
   
   # Path = ../data
-
-  print(path)
-  cutoff_frequencies = None
+  
+  with open(path) as f:
+    nums = [line.rstrip() for line in f]
+  nums = nums[:len(nums)]
+  cutoff_frequencies = np.asarray(nums)
 
   ### END OF STUDENT CODE ####
   ############################
-
   return cutoff_frequencies
 
 
