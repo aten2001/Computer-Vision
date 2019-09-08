@@ -82,7 +82,6 @@ def get_cutoff_frequencies(path: str) -> List[int]:
 
   ### END OF STUDENT CODE ####
   ############################
-  print(cutoff_frequencies)
   return cutoff_frequencies
 
 

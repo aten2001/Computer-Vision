@@ -33,7 +33,7 @@ def create_Gaussian_kernel(cutoff_frequency):
   mean = math.floor(k / 2)
   stdev = cutoff_frequency
   kern1dim = []
-  for i in range(k):
+  for i in range(int(k)):
     prob =  (np.exp(-( (i-mean)**2 / (2*stdev**2) ) ) / np.sqrt(2*np.pi*stdev))
     kern1dim.append(prob)
   
