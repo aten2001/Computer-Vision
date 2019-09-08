@@ -83,8 +83,8 @@ def get_allocs(syms, prices):
   			  	 		  		  		    	 		 		   		 		  
 # This is the function that will be tested by the autograder  		   	  			  	 		  		  		    	 		 		   		 		  
 # The student must update this code to properly implement the functionality  		   	  			  	 		  		  		    	 		 		   		 		  
-def optimize_portfolio(sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1), \
-    syms=['GOOG','AAPL','GLD','XOM'], gen_plot=True):  		   	  			  	 		  		  		    	 		 		   		 		  
+def optimize_portfolio(sd=dt.datetime(2008,6,1), ed=dt.datetime(2009,6,1), \
+    syms= ['IBM', 'X', 'GLD', 'JPM'], gen_plot=True):  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     # Read in adjusted closing prices for given symbols, date range  		   	  			  	 		  		  		    	 		 		   		 		  
     dates = pd.date_range(sd, ed)  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -131,9 +131,9 @@ def test_code():
     # Note that ALL of these values will be set to different values by  		   	  			  	 		  		  		    	 		 		   		 		  
     # the autograder!  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-    start_date = dt.datetime(2009,1,1)  		   	  			  	 		  		  		    	 		 		   		 		  
-    end_date = dt.datetime(2010,1,1)  		   	  			  	 		  		  		    	 		 		   		 		  
-    symbols = ['GOOG', 'AAPL', 'GLD', 'XOM', 'IBM']  		   	  			  	 		  		  		    	 		 		   		 		  
+    start_date = dt.datetime(2008,6,1)  		   	  			  	 		  		  		    	 		 		   		 		  
+    end_date = dt.datetime(2009,6,1)  		   	  			  	 		  		  		    	 		 		   		 		  
+    symbols = ['IBM', 'X', 'GLD', 'JPM'] 		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     # Assess the portfolio  		   	  			  	 		  		  		    	 		 		   		 		  
     allocations, cr, adr, sddr, sr = optimize_portfolio(sd = start_date, ed = end_date,\
