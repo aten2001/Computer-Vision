@@ -84,7 +84,7 @@ def get_allocs(syms, prices):
 # This is the function that will be tested by the autograder  		   	  			  	 		  		  		    	 		 		   		 		  
 # The student must update this code to properly implement the functionality  		   	  			  	 		  		  		    	 		 		   		 		  
 def optimize_portfolio(sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1), \
-    syms=['GOOG','AAPL','GLD','XOM'], gen_plot=False):  		   	  			  	 		  		  		    	 		 		   		 		  
+    syms=['GOOG','AAPL','GLD','XOM'], gen_plot=True):  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     # Read in adjusted closing prices for given symbols, date range  		   	  			  	 		  		  		    	 		 		   		 		  
     dates = pd.date_range(sd, ed)  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -105,17 +105,20 @@ def optimize_portfolio(sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1), \
     # Get daily portfolio value
     normalized_prices = normalize(prices)
     total_value = (allocs * normalized_prices).sum(axis=1)
-    port_val = get_returns(total_value)		  			  	 		  		  		    	 		 		   		 		  
+    port_val = total_value	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		     	  			  	 		  		  		    	 		 		   		 	 	  			  	 		  		  		    	 		 		   		 		  
     # Compare daily portfolio value with SPY using a normalized plot  		   	  			  	 		  		  		    	 		 		   		 		  
     if gen_plot:  		   	  			  	 		  		  		    	 		 		   		 		  
-        # add code to plot here  		
-        #  ax = df1.plot()
-        #df2.plot(ax=ax)  	  			  	 		  		  		    	 		 		   		 		  
-        df_temp = pd.concat([port_val, prices_SPY], keys=['Portfolio', 'SPY'], axis=1)
-        df_temp.plot(df_temp)
-        plt.show()
-          		  		    	 		 		   		 		  
+        chart = port_val.plot(title = "Daily Portfolio Value and SPY", label='Portfolio', color='blue')
+        benchmark = normalize(get_data(['SPY'], dates=dates))
+        benchmark.plot(label="SPY", color='green', ax=chart)
+        chart.legend(loc='upper left')
+        chart.set_xlabel("Date")
+        chart.set_ylabel("Price")
+        chart.figure.savefig("results.png")
+    
+    
+    
   		   	  			  	 		  		  		    	 		 		   		 		  
     return allocs, cr, adr, sddr, sr  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
@@ -135,7 +138,7 @@ def test_code():
     # Assess the portfolio  		   	  			  	 		  		  		    	 		 		   		 		  
     allocations, cr, adr, sddr, sr = optimize_portfolio(sd = start_date, ed = end_date,\
         syms = symbols, \
-        gen_plot = False)  		   	  			  	 		  		  		    	 		 		   		 		  
+        gen_plot = True)  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     # Print statistics  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"Start Date: {start_date}")  		   	  			  	 		  		  		    	 		 		   		 		  
