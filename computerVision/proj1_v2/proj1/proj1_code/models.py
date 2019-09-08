@@ -49,17 +49,14 @@ class HybridImageModel(nn.Module):
 
     ############################
     ### TODO: YOUR CODE HERE ###
-
     gauss = create_Gaussian_kernel(cutoff_frequency)
     k = gauss.shape[0]
     c = self.n_channels
     arr = np.tile(gauss, c)
-    kernel = np.reshape(arr, (c,1,k,k))
-    kernel = torch.Tensor(kernel)
+    kernel = torch.Tensor(np.reshape(arr, (c,1,k,k)))
 
     ### END OF STUDENT CODE ####
     ############################
-
     return kernel
 
   def low_pass(self, x, kernel):
