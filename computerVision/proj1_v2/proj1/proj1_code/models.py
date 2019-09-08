@@ -50,8 +50,12 @@ class HybridImageModel(nn.Module):
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError('`get_kernel` function in `models.py` needs ' +
-      'to be implemented')
+    gauss = create_Gaussian_kernel(cutoff_frequency)
+    k = gauss.shape[0]
+    c = self.n_channels
+    arr = np.tile(gauss, c)
+    kernel = np.reshape(arr, (c,1,k,k))
+    kernel = torch.Tensor(kernel)
 
     ### END OF STUDENT CODE ####
     ############################
@@ -79,9 +83,9 @@ class HybridImageModel(nn.Module):
 
     ############################
     ### TODO: YOUR CODE HERE ###
-
-    raise NotImplementedError('`low_pass` function in `models.py` needs to '
-      + 'be implemented')
+    h = kernel.shape[2]
+    w = kernel.shape[3]
+    filtered_image = F.conv2d(x, kernel, padding=(h // 2, w // 2), groups=self.n_channels)
 
     ### END OF STUDENT CODE ####
     ############################
@@ -113,13 +117,17 @@ class HybridImageModel(nn.Module):
     - If you want to use images with different dimensions, you should resize
       them in the HybridImageDataset class using torchvision.transforms.
     """
-    self.n_channels = image1.shape[1]
+   
 
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError('`forward` function in `models.py` needs to '
-      + 'be implemented')
+    self.n_channels = image1.shape[1]
+    kernel = self.get_kernel(cutoff_frequency)
+    low_frequencies = self.low_pass(image1, kernel)
+    high_frequencies = image2 - self.low_pass(image2, kernel)
+    hybrid_image = high_frequencies + low_frequencies
+    hybrid_image = torch.clamp(hybrid_image, 0, 1)
 
     ### END OF STUDENT CODE ####
     ############################

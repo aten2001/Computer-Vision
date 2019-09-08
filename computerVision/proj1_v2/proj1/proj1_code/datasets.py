@@ -49,7 +49,8 @@ def make_dataset(path: str) -> Tuple[List[str],List[str]]:
 
   ### END OF STUDENT CODE ####
   ############################
-
+  images_a.sort()
+  images_b.sort()
   return images_a, images_b
 
 
@@ -75,7 +76,8 @@ def get_cutoff_frequencies(path: str) -> List[int]:
   
   with open(path) as f:
     nums = [line.rstrip() for line in f]
-  nums = nums[:len(nums)]
+  nums = nums[:len(nums) - 1]
+  nums = list(map(int, nums))
   cutoff_frequencies = np.asarray(nums)
 
   ### END OF STUDENT CODE ####
@@ -104,19 +106,18 @@ class HybridImageDataset(data.Dataset):
     images_a, images_b = make_dataset(image_dir)
     cutoff_frequencies = get_cutoff_frequencies(cf_file)
 
-    self.transform = None
+    self.transform = transforms.ToTensor()
     ############################
     ### TODO: YOUR CODE HERE ###
-
-    raise NotImplementedError('`self.transform` function in `datasets.py` needs to '
-      + 'be implemented')
+    
+    self.images_a = images_a
+    self.images_b = images_b
+    self.cutoff_frequencies = cutoff_frequencies
 
     ### END OF STUDENT CODE ####
     ############################
 
-    self.images_a = images_a
-    self.images_b = images_b
-    self.cutoff_frequencies = cutoff_frequencies
+   
 
   def __len__(self) -> int:
     """Returns number of pairs of images in dataset."""
@@ -124,8 +125,7 @@ class HybridImageDataset(data.Dataset):
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    raise NotImplementedError('`__len__` function in `datasets.py` needs to '
-      + 'be implemented')
+    return len(self.images_a)
 
     ### END OF STUDENT CODE ####
     ############################
@@ -156,9 +156,12 @@ class HybridImageDataset(data.Dataset):
 
     ############################
     ### TODO: YOUR CODE HERE ###
+    image_a_path = PIL.Image.open(self.images_a[idx])
+    image_b_path = PIL.Image.open(self.images_b[idx])
+    cutoff_frequency = self.cutoff_frequencies[idx]
 
-    raise NotImplementedError('`__getitem__ function in `datasets.py` needs '
-      + 'to be implemented')
+    image_a = self.transform(image_a_path)
+    image_b = self.transform(image_b_path)
 
     ### END OF STUDENT CODE ####
     ############################
