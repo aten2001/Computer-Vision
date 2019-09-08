@@ -29,21 +29,58 @@ GT ID: 903304661 (replace with your GT ID)
 import pandas as pd  		   	  			  	 		  		  		    	 		 		   		 		  
 import matplotlib.pyplot as plt  		   	  			  	 		  		  		    	 		 		   		 		  
 import numpy as np  		   	  			  	 		  		  		    	 		 		   		 		  
-import datetime as dt  		   	  			  	 		  		  		    	 		 		   		 		  
+import datetime as dt  		  
+import scipy.optimize as opt 	  			  	 		  		  		    	 		 		   		 		  
 from util import get_data, plot_data
 
 
-def normalize(df):
-    return df / df.ix[0,:]
+def normalize(prices):
+    return prices / prices.iloc[0]
+
+def get_returns(prices):
+    return prices.pct_change()
+
+def calc_sharpe_ratio(returns_df, rfr=0.0):
+    trading_days = 252.0
+    excessReturn = (returns_df[1:] - rfr).mean()
+    excessReturnStd = (returns_df[1:] - rfr).std()
+    return np.sqrt(trading_days) * (excessReturn / excessReturnStd)
+
 
 def get_portfolio_stats(allocs, prices):
-    rfr = 0.0
-    sf = 252.0
-
+    #return  sharpe ratio (sr), cr (cumulative return), adr (avg daily return), sddr (st. dev daily return)
     normalized_prices = normalize(prices)
     total_value = (allocs * normalized_prices).sum(axis=1)
+    returns_df = get_returns(total_value)
 
-  		   	  			  	 		  		  		    	 		 		   		 		  
+    #calculate cr
+    start = total_value[0]
+    end_gains = total_value[-1]
+    cr = (end_gains - start / start)
+    
+    #calc adr and sddr
+    adr = returns_df.mean()
+    sddr = returns_df.std()
+
+    #call helper fun to calc sharpe ratio
+    sr = calc_sharpe_ratio(returns_df)
+
+    return cr, adr, sddr, sr
+
+def negate_sharpe(allocs, prices):
+    cr, adr, sddr, sr = get_portfolio_stats(allocs, prices)
+    return -1.0 * sr
+
+def get_allocs(syms, prices):
+    allocs = len(syms) * [1.0/len(syms)]
+    limits = ((0,1), ) * len(syms)
+    optimized = opt.minimize(negate_sharpe, allocs, args=(prices,),method='SLSQP',bounds=limits,
+                                constraints=({'type':'eq', 'fun': lambda x:np.sum(x)-1}))
+    allocs = optimized["x"]
+    return allocs
+
+
+  			  	 		  		  		    	 		 		   		 		  
 # This is the function that will be tested by the autograder  		   	  			  	 		  		  		    	 		 		   		 		  
 # The student must update this code to properly implement the functionality  		   	  			  	 		  		  		    	 		 		   		 		  
 def optimize_portfolio(sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1), \
@@ -54,21 +91,31 @@ def optimize_portfolio(sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1), \
     prices_all = get_data(syms, dates)  # automatically adds SPY  		   	  			  	 		  		  		    	 		 		   		 		  
     prices = prices_all[syms]  # only portfolio symbols  		   	  			  	 		  		  		    	 		 		   		 		  
     prices_SPY = prices_all['SPY']  # only SPY, for comparison later  		   	  			  	 		  		  		    	 		 		   		 		  
-
-    print(prices)	   	  			  	 		  		  		    	 		 		   		 		  
+    
+    
     # find the allocations for the optimal portfolio  		   	  			  	 		  		  		    	 		 		   		 		  
     # note that the values here ARE NOT meant to be correct for a test case  		   	  			  	 		  		  		    	 		 		   		 		  
-    allocs = np.asarray([0.2, 0.2, 0.3, 0.3]) # add code here to find the allocations  		   	  			  	 		  		  		    	 		 		   		 		  
-    cr, adr, sddr, sr = [0.25, 0.001, 0.0005, 2.1] # add code here to compute stats  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
-    # Get daily portfolio value  		   	  			  	 		  		  		    	 		 		   		 		  
-    port_val = prices_SPY # add code here to compute daily portfolio values  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+    allocs = np.asarray([0.2, 0.1, 0.3, 0.3, 0.1]) # add code here to find the allocations  		   	  			  	 		  		  		    	 		 		   		 		  
+    cr, adr, sddr, sr = [0.25, 0.001, 0.0005, 2.1] # add code here to compute stats
+
+    #GET ALLOCS & PROTFOLIO STATS
+    allocs = get_allocs(syms, prices)
+    cr, adr, sddr, sr = get_portfolio_stats(allocs, prices)  
+
+    # Get daily portfolio value
+    normalized_prices = normalize(prices)
+    total_value = (allocs * normalized_prices).sum(axis=1)
+    port_val = get_returns(total_value)		  			  	 		  		  		    	 		 		   		 		  
+  		   	  			  	 		  		  		    	 		 		   		 		     	  			  	 		  		  		    	 		 		   		 	 	  			  	 		  		  		    	 		 		   		 		  
     # Compare daily portfolio value with SPY using a normalized plot  		   	  			  	 		  		  		    	 		 		   		 		  
     if gen_plot:  		   	  			  	 		  		  		    	 		 		   		 		  
-        # add code to plot here  		   	  			  	 		  		  		    	 		 		   		 		  
-        df_temp = pd.concat([port_val, prices_SPY], keys=['Portfolio', 'SPY'], axis=1)  		   	  			  	 		  		  		    	 		 		   		 		  
-        pass  		   	  			  	 		  		  		    	 		 		   		 		  
+        # add code to plot here  		
+        #  ax = df1.plot()
+        #df2.plot(ax=ax)  	  			  	 		  		  		    	 		 		   		 		  
+        df_temp = pd.concat([port_val, prices_SPY], keys=['Portfolio', 'SPY'], axis=1)
+        df_temp.plot(df_temp)
+        plt.show()
+          		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     return allocs, cr, adr, sddr, sr  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
