@@ -52,8 +52,13 @@ class HybridImageModel(nn.Module):
     gauss = create_Gaussian_kernel(cutoff_frequency)
     k = gauss.shape[0]
     c = self.n_channels
-    arr = np.tile(gauss, c)
-    kernel = torch.Tensor(np.reshape(arr, (c,1,k,k)))
+    #arr = np.tile(gauss, c)
+    #kernel = torch.Tensor(np.reshape(arr, (c,1,k,k)))
+
+    kernel = np.zeros((self.n_channels, 1, k ,k))
+    for c in range(self.n_channels):
+      kernel[c][0] = gauss
+    kernel = torch.Tensor(kernel)
 
     ### END OF STUDENT CODE ####
     ############################
@@ -123,7 +128,7 @@ class HybridImageModel(nn.Module):
     kernel = self.get_kernel(cutoff_frequency)
     low_frequencies = self.low_pass(image1, kernel)
     high_frequencies = image2 - self.low_pass(image2, kernel)
-    hybrid_image = high_frequencies + low_frequencies
+    hybrid_image = torch.add(low_frequencies, high_frequencies)
     hybrid_image = torch.clamp(hybrid_image, 0, 1)
 
     ### END OF STUDENT CODE ####
