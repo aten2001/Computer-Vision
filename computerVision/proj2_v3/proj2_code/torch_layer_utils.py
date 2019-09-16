@@ -3,6 +3,8 @@
 import torch
 from torch import nn
 import numpy as np
+import math
+
 """
 Image gradients are needed for both SIFT and the Harris Corner Detector, so we
 implement the necessary code only once, here.
@@ -68,9 +70,19 @@ def get_gaussian_kernel(ksize=7, sigma=5) -> torch.nn.Parameter:
 
     ############################
     ### TODO: YOUR CODE HERE ###
+    k = (sigma *4) + 1
+    mean = math.floor(k / 2)
+    stdev = sigma
+    kern1dim = []
+    for i in range(int(k)):
+        prob =  (np.exp(-( (i-mean)**2 / (2*stdev**2) ) ) / np.sqrt(2*np.pi*stdev))
+        kern1dim.append(prob)
+  
+    kernel = np.outer(kern1dim, kern1dim)
+    kernel = (1/ np.sum(kernel)) * kernel
 
-    raise NotImplementedError('`get_gaussian_kernel` need to be '
-        + 'implemented')
+    kernel = torch.as_tensor(kernel)
+    kernel = nn.Parameter(kernel)
 
     ### END OF STUDENT CODE ####
     ############################

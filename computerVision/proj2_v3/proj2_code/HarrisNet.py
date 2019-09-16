@@ -132,9 +132,15 @@ class ChannelProductLayer(torch.nn.Module):
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
+        split_input = torch.chunk(x, 2)
+        Ix = split_input[0]
+        Iy = split_input[1]
 
-        raise NotImplementedError('`ChannelProductLayer` need to be '
-            + 'implemented')
+        Ixx = torch.mul(Ix, Ix)
+        Iyy = torch.mul(Iy, Iy)
+        Ixy = torch.mul(Ix, Iy)
+
+        output = torch.cat((Ixx, Iyy, Ixy))
 
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -166,13 +172,16 @@ class SecondMomentMatrixLayer(torch.nn.Module):
         super(SecondMomentMatrixLayer, self).__init__()
         self.ksize = ksize
         self.sigma = sigma
+        
 
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
-
-        raise NotImplementedError('`SecondMomentMatrixLayer` need to be '
-            + 'implemented')
+        self.conv2d = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=self.ksize,
+            bias=False, padding=(1,1), padding_mode='zeros')
+        
+        self.conv2d.weight = get_gaussian_kernel()
+        
 
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -199,8 +208,7 @@ class SecondMomentMatrixLayer(torch.nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
 
-        raise NotImplementedError('`SecondMomentMatrixLayer` needs to be '
-            + 'implemented')
+        output = self.conv2d(x)
 
         #######################################################################
         #                           END OF YOUR CODE                          #
