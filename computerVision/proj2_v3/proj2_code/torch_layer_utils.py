@@ -108,15 +108,21 @@ def get_sobel_xy_parameters() -> torch.nn.Parameter:
     ############################
     ### TODO: YOUR CODE HERE ###
 
-    sobel_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0 ,1]])
-    sobel_y = np.array([[-1, -2, -1], [0, 0, 0], [1, 2 ,1]])
+    sobel_x = torch.as_tensor(np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0 ,1]]), dtype=float)
+    sobel_y = torch.as_tensor(np.array([[-1, -2, -1], [0, 0, 0], [1, 2 ,1]]), dtype=float)
 
-    kernel = np.tile(sobel_x, 2)
+    sobel_x = sobel_x.view(1,3,3)
+    sobel_y = sobel_y.view(1,3,3)
+
+
+    """kernel = np.tile(sobel_x, 2)
     kernel = np.reshape(kernel, (2,1,3,3))
     kernel[0] = sobel_x
-    kernel[1] = sobel_y
+    kernel[1] = sobel_y"""
 
-    kernel = torch.as_tensor(kernel, dtype=float)
+
+    kernel = torch.stack((sobel_x, sobel_y), 0)
+    kernel = kernel.float()
     kernel = nn.Parameter(kernel)
 
 
