@@ -132,7 +132,7 @@ class ChannelProductLayer(torch.nn.Module):
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
-        split_input = torch.chunk(x, 2)
+        split_input = torch.chunk(x, 2, dim=1)
         Ix = split_input[0]
         Iy = split_input[1]
 
@@ -140,7 +140,7 @@ class ChannelProductLayer(torch.nn.Module):
         Iyy = torch.mul(Iy, Iy)
         Ixy = torch.mul(Ix, Iy)
 
-        output = torch.cat((Ixx, Iyy, Ixy))
+        output = torch.cat((Ixx, Iyy, Ixy), dim=1)
 
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -178,7 +178,7 @@ class SecondMomentMatrixLayer(torch.nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
         self.conv2d = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=self.ksize,
-            bias=False, padding=(1,1), padding_mode='zeros')
+            bias=False, padding=(ksize // 2, ksize // 2), padding_mode='zeros')
         
         self.conv2d.weight = get_gaussian_kernel()
         
@@ -254,9 +254,28 @@ class CornerResponseLayer(torch.nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
 
-        raise NotImplementedError('`CornerResponseLayer` needs to be ''
-            + 'implemented')
+        split_x = torch.chunk(x, 3, dim=1)
+        Sxx = split_x[0]
+        Syy = split_x[1]
+        Sxy = split_x[2]
+        
+        tensorList = [Sxx, Syy, Sxy]
 
+        for tensor in tensorList:
+            tensor.squeeze()
+        
+        #det(A) = ad-bc, trace(A) = a+d
+        #det(a) = Sxx * Syy - (Sxy ^ 2)
+        det = torch.mul(Sxx, Syy) - torch.mul(Sxy, Sxy)
+        trace = torch.add(Sxx, Syy)
+
+        # R = det(m) - alpha(trace(m))^2
+        alphaTrace = torch.mul(self.alpha, trace)
+        alphaTrace2 = torch.mul(alphaTrace, alphaTrace)
+
+        R = det - alphaTrace2
+
+        output = R
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
@@ -305,8 +324,14 @@ class NMSLayer(torch.nn.Module):
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
+        zeros = torch.zeros((x.shape[0], x.shape[1], x.shape[2], x.shape[3]))
+        threshold = torch.where(x > torch.median(x), x, zeros)
 
-        raise NotImplementedError('`NMSLayer` needs to be implemented')
+        m = nn.MaxPool2d((7, 7), padding=3, stride=1)
+        maxed = m(threshold)
+
+        binrzed = torch.where(threshold == maxed, threshold, zeros )
+        output = binrzed
 
 
         #######################################################################
@@ -351,8 +376,7 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`get_interest_points` in `HarrisNet.py needs `
-        + 'be implemented')
+    raise NotImplementedError('get_interest_points in HarrisNet.py needs + be implemented')
 
     # This dummy code will compute random score for each pixel, you can
     # uncomment this and run the project notebook and see how it detects random
