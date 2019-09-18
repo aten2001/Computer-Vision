@@ -70,7 +70,7 @@ def get_gaussian_kernel(ksize=7, sigma=5) -> torch.nn.Parameter:
 
     ############################
     ### TODO: YOUR CODE HERE ###
-    k = (sigma *4) + 1
+    k = ksize
     mean = math.floor(k / 2)
     stdev = sigma
     kern1dim = []
@@ -83,6 +83,7 @@ def get_gaussian_kernel(ksize=7, sigma=5) -> torch.nn.Parameter:
 
     kernel = torch.as_tensor(kernel)
     kernel = nn.Parameter(kernel)
+    print(kernel.shape)
 
     ### END OF STUDENT CODE ####
     ############################

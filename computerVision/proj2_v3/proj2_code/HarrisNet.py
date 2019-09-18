@@ -178,9 +178,14 @@ class SecondMomentMatrixLayer(torch.nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
         self.conv2d = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=self.ksize,
-            bias=False, padding=(ksize // 2, ksize // 2), padding_mode='zeros')
+            bias=False, groups=3,padding=(ksize // 2, ksize // 2), padding_mode='zeros')
         
-        self.conv2d.weight = get_gaussian_kernel()
+        kernel = get_gaussian_kernel(self.ksize, self.sigma)
+        kernel = kernel.view(1, self.ksize, self.ksize)
+        kernel = torch.stack((kernel, kernel, kernel), 0)
+        kernel = kernel.float()
+        kernel = nn.Parameter(kernel)
+        self.conv2d.weight = kernel
         
 
         #######################################################################
@@ -270,10 +275,10 @@ class CornerResponseLayer(torch.nn.Module):
         trace = torch.add(Sxx, Syy)
 
         # R = det(m) - alpha(trace(m))^2
-        alphaTrace = torch.mul(self.alpha, trace)
-        alphaTrace2 = torch.mul(alphaTrace, alphaTrace)
+        trace2 = torch.mul(trace, trace)
+        alphaTrace = torch.mul(self.alpha, trace2)
 
-        R = det - alphaTrace2
+        R = det - alphaTrace
 
         output = R
         #######################################################################

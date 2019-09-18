@@ -238,6 +238,8 @@ def test_CornerResponseLayer():
         [  5.5500,   3.2000,   0.5500]]
       ]
     ])
+  print(R)
+  print(R_gt)
   assert torch.allclose(R, R_gt.unsqueeze(0),rtol=1e-04)
 
 
