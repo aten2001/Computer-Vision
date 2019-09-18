@@ -71,14 +71,23 @@ class HarrisNet(nn.Module):
         super(HarrisNet, self).__init__()
 
         image_gradients_layer = ImageGradientsLayer()
+        
+
 
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
-
-        raise NotImplementedError('`HarrisNet.__init__` function in '
-             + '`HarrisNet.py` needs to be implemented')
-        self.net = None # <--replace this with your implementation
+        channel_product_layer = ChannelProductLayer()
+        second_moment_matrix_layer = SecondMomentMatrixLayer()
+        corner_response_layer = CornerResponseLayer()
+        NMS_layer = NMSLayer()
+        
+        self.net = nn.Sequential(image_gradients_layer, 
+                                channel_product_layer,
+                                second_moment_matrix_layer,
+                                corner_response_layer,
+                                NMS_layer
+                                ) # <--replace this with your implementation
 
         #######################################################################
         #                           END OF YOUR CODE                          #
