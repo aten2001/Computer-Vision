@@ -403,15 +403,15 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
         point = (x_val,y_val)
         point_score_dict.update( {point: score})
 
-    sorted_point_score_dict = sorted(point_score_dict.items(), key=lambda x: x[1])
-
+    sorted_point_score_dict = sorted(point_score_dict.items(), reverse=True, key=lambda x: x[1])
+    
     x = []
     y = []
     confidences = []
 
     for sorted_pair in sorted_point_score_dict:
-        x.append(sorted_pair[0][0])
-        y.append(sorted_pair[0][1])
+        x.append(sorted_pair[0][1])
+        y.append(sorted_pair[0][0])
         confidences.append(sorted_pair[1])
     
     x = torch.Tensor(x)
@@ -456,7 +456,9 @@ def remove_border_vals(img, x: torch.Tensor, y: torch.Tensor, c: torch.Tensor) -
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-
+    print(x)
+    print(y)
+    print(c)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
