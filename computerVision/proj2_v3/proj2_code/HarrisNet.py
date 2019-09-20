@@ -389,8 +389,20 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
+    non_zero = torch.nonzero(R)
+    #print(non_zero)
+    #print(R[0][0][9][9])
+    x_vals = []
+    y_vals = []
+    print(non_zero)
+    for i in range(len(non_zero)):
+        x_vals.append(non_zero[0][0][i][0])
+        y_vals.append(non_zero[0][0][i][1])
+    print(x_vals)
+    print(y_vals)
 
-    raise NotImplementedError('get_interest_points in HarrisNet.py needs + be implemented')
+        
+    
 
     # This dummy code will compute random score for each pixel, you can
     # uncomment this and run the project notebook and see how it detects random
