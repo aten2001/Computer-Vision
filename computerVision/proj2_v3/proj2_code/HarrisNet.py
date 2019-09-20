@@ -418,6 +418,8 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     y = torch.Tensor(y)
     confidences = torch.Tensor(confidences)
 
+    x, y , confidences = remove_border_vals(image, x, y, confidences)
+
     # This dummy code will compute random score for each pixel, you can
     # uncomment this and run the project notebook and see how it detects random
     # points.
@@ -454,8 +456,6 @@ def remove_border_vals(img, x: torch.Tensor, y: torch.Tensor, c: torch.Tensor) -
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`remove_border_vals` in `HarrisNet.py` needs '
-        + 'to be implemented')
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
