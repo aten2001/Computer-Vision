@@ -452,15 +452,28 @@ def remove_border_vals(img, x: torch.Tensor, y: torch.Tensor, c: torch.Tensor) -
     -   y: Torch tensor of shape (N,)
     -   c: Torch tensor of shape (N,)
     """
+
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
+    x_2 = x.clone()
+    y_2 = y.clone()
+    c_2 = c.clone()
 
-    print(x)
-    print(y)
-    print(c)
+    for i in range(len(x)):
+        if x[i].item() < 8 or x[i].item() > img.shape[3] - 8:
+            x_2 = torch.cat((x_2[:i], x_2[i+1:]))
+            y_2 = torch.cat((y_2[:i], y_2[i+1:]))
+            c_2 = torch.cat((c_2[:i], c_2[i+1:]))
+        elif y[i].item() < 8 or y[i].item() > img.shape[2] - 8:
+            x_2 = torch.cat((x_2[:i], x_2[i+1:]))
+            y_2 = torch.cat((y_2[:i], y_2[i+1:]))
+            c_2 = torch.cat((c_2[:i], c_2[i+1:]))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
 
+    x = x_2
+    y = y_2
+    c = c_2
     return x, y, c
