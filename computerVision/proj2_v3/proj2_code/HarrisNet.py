@@ -392,17 +392,31 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     non_zero = torch.nonzero(R)
     #print(non_zero)
     #print(R[0][0][9][9])
-    x_vals = []
-    y_vals = []
-    print(non_zero)
-    for i in range(len(non_zero)):
-        x_vals.append(non_zero[0][0][i][0])
-        y_vals.append(non_zero[0][0][i][1])
-    print(x_vals)
-    print(y_vals)
-
-        
+    point_score_dict = {}
     
+    for i in range(len(non_zero)):
+        #x_vals.append(pair[2])
+        #y_vals.append(pair[3])
+        x_val = non_zero[i][2].item()
+        y_val = non_zero[i][3].item()
+        score = R[0][0][x_val][y_val].item()
+        point = (x_val,y_val)
+        point_score_dict.update( {point: score})
+
+    sorted_point_score_dict = sorted(point_score_dict.items(), key=lambda x: x[1])
+
+    x = []
+    y = []
+    confidences = []
+
+    for sorted_pair in sorted_point_score_dict:
+        x.append(sorted_pair[0][0])
+        y.append(sorted_pair[0][1])
+        confidences.append(sorted_pair[1])
+    
+    x = torch.Tensor(x)
+    y = torch.Tensor(y)
+    confidences = torch.Tensor(confidences)
 
     # This dummy code will compute random score for each pixel, you can
     # uncomment this and run the project notebook and see how it detects random
