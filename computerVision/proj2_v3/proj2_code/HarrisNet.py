@@ -393,6 +393,8 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     #print(non_zero)
     #print(R[0][0][9][9])
     point_score_dict = {}
+    print(non_zero)
+    print(non_zero[0][3])
     
     for i in range(len(non_zero)):
         #x_vals.append(pair[2])
