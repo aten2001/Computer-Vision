@@ -58,7 +58,7 @@ if __name__=="__main__":
     predY = learner.query(trainX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("In sample results")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("In sample results LinReg")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
     c = np.corrcoef(predY, y=trainY)  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"corr: {c[0,1]}")  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -67,11 +67,12 @@ if __name__=="__main__":
     predY = learner.query(testX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((testY - predY) ** 2).sum()/testY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("Out of sample results")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("Out of sample results LinReg")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
     c = np.corrcoef(predY, y=testY)  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"corr: {c[0,1]}")  	
 
+    # TEST DT LEARNER
     import DTLearner as dt
     learnerD = dt.DTLearner(leaf_size = 1, verbose = False) # constructor
     learnerD.addEvidence(trainX, trainY) # training step
@@ -81,7 +82,7 @@ if __name__=="__main__":
     predY = learnerD.query(trainX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("In sample results")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("In sample results DTLearner")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
     c = np.corrcoef(predY, y=trainY)  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"corr: {c[0,1]}")  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -90,7 +91,31 @@ if __name__=="__main__":
     predY = learnerD.query(testX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
     rmse = math.sqrt(((testY - predY) ** 2).sum()/testY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("Out of sample results")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("Out of sample results DT Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
     print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
     c = np.corrcoef(predY, y=testY)  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"corr: {c[0,1]}")	 		  		  		    	 		 		   		 		  
+    print(f"corr: {c[0,1]}")	 
+    
+    #TEST RT LEARNER
+    import RTLearner as rt
+    learnerD = rt.RTLearner(leaf_size = 1, verbose = False) # constructor
+    learnerD.addEvidence(trainX, trainY) # training step
+    YD = learner.query(testX) # query 
+
+    # evaluate in sample  		   	  			  	 		  		  		    	 		 		   		 		  
+    predY = learnerD.query(trainX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
+    rmse = math.sqrt(((trainY - predY) ** 2).sum()/trainY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("In sample results RTLearner")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    c = np.corrcoef(predY, y=trainY)  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"corr: {c[0,1]}")  		   	  			  	 		  		  		    	 		 		   		 		  
+  		   	  			  	 		  		  		    	 		 		   		 		  
+    # evaluate out of sample  		   	  			  	 		  		  		    	 		 		   		 		  
+    predY = learnerD.query(testX) # get the predictions  		   	  			  	 		  		  		    	 		 		   		 		  
+    rmse = math.sqrt(((testY - predY) ** 2).sum()/testY.shape[0])  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("Out of sample results RT Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"RMSE: {rmse}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    c = np.corrcoef(predY, y=testY)  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"corr: {c[0,1]}")		  		  		    	 		 		   		 		  

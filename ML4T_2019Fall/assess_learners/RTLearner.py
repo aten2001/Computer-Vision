@@ -1,7 +1,7 @@
    	  			  	 		  		  		    	 		 		   		 		  
 import numpy as np  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-class DTLearner(object):  		   	  			  	 		  		  		    	 		 		   		 		  
+class RTLearner(object):  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     def __init__(self, leaf_size=1, verbose = False):  		   	  			  	 		  		  		    	 		 		   		 		  
         self.leaf_size = leaf_size
@@ -27,36 +27,38 @@ class DTLearner(object):
         if data.shape[0] <= self.leaf_size: return leaf
         
         #find best i to split on, using coeffecients
-        possible_feats = range(data.shape[1])
+        """possible_feats = range(data.shape[1])
         coeffecients = []
         for index in possible_feats:
-            coMatrix = np.corrcoef(data[:,index], Y)
-            coeff = coMatrix[0,1]
-            coeffecients.append((np.abs(coeff),index))
-        
-        coeffecients.sort(reverse=True)
-        i= coeffecients[0][1]
-        #print("max value is {}".format(i))
-        splitVal = np.median(data[:,i])
-        
-        left = data[:, i] <= splitVal
+            rand_i =np.random.choice(data.shape[1])
+            randRows =[np.random.randint(0, data.shape[0]), np.random.randint(0, data.shape[0])]
+            if randRows[0] == randRows[1]:
+                break"""
 
-        if ((np.all(left)) or np.all(~left)):
-            return leaf
+        for attempt in range(0,10):
+            rand_i = [np.random.randint(0, data.shape[0]), np.random.randint(0, data.shape[0])]
+            rand_ft = np.random.randint(0, data.shape[1])
+            #if both rows diff, break 
+            if data[rand_i[1], rand_ft] != data[rand_i[0], rand_ft]:
+                break
+            
+        #after 10 tries just make leaf
+        if data[rand_i[1], rand_ft] == data[rand_i[0], rand_ft]:
+            return leaf;
 
-        #lefttree = self.buildTree(data[data[:,small]<=splitVal] , Y[data[:,small]<=splitVal])
-        #righttree= self.buildTree(data[data[:,~small]>splitVal], Y[data[:,~small]>splitVal])
-
-        lefttree = self.buildTree(data[left,:], Y[left])
-        righttree = self.buildTree(data[~left,:], Y[~left])
+        total = (data[rand_i[0], rand_ft] + data[rand_i[1], rand_ft])
+        mean = total / 2
+        split_val = mean
+        lefttree = self.buildTree(data[(data[:, rand_ft] <= split_val), :], Y[(data[:, rand_ft] <= split_val)]);
+        righttree = self.buildTree(data[(data[:, rand_ft] > split_val), :], Y[(data[:, rand_ft] > split_val)]);
 
         if lefttree.ndim == 1:
             righttree_start = 2
         elif lefttree.ndim > 1:
             righttree_start = lefttree.shape[0] + 1
-        root = np.array([i, splitVal, 1, righttree_start])
+        root = np.array([rand_ft, split_val, 1, righttree_start])
 
-        #result = np.concatenate((root, lefttree, righttree))
+        #result = np.concatenate((root, lefttree, righttree))"""
         return np.vstack((root, lefttree, righttree))
           	 		  		  		    	 		 		   		 		  
     def addEvidence(self,dataX,dataY):  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -91,4 +93,4 @@ class DTLearner(object):
         	   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("DT Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("RT Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
