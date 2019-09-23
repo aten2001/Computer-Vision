@@ -41,8 +41,7 @@ class RTLearner(object):
             #if both rows diff, break 
             if data[rand_i[1], rand_ft] != data[rand_i[0], rand_ft]:
                 break
-            
-        #after 10 tries just make leaf
+        #after 10 tries just make a leaf
         if data[rand_i[1], rand_ft] == data[rand_i[0], rand_ft]:
             return leaf;
 
@@ -56,7 +55,7 @@ class RTLearner(object):
             righttree_start = 2
         elif lefttree.ndim > 1:
             righttree_start = lefttree.shape[0] + 1
-        root = np.array([rand_ft, split_val, 1, righttree_start])
+        root = np.array([rand_ft, split_val, 1, righttree_start], dtype=float)
 
         #result = np.concatenate((root, lefttree, righttree))"""
         return np.vstack((root, lefttree, righttree))

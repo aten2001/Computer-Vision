@@ -1,20 +1,19 @@
-   	  			  	 		  		  		    	 		 		   		 		  
 import numpy as np  	
-from scipy import stats	   	  			  	 		  		  		    	 		 		   		 		  
+from scipy import stats
+import BagLearner as bl
+import LinRegLearner as lrl
+import DTLearner as dtl	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-class BagLearner(object):  		   	  			  	 		  		  		    	 		 		   		 		  
+class InsaneLearner(object):  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-    def __init__(self, learner, kwargs, bags, boost=False,verbose = False):
+    def __init__(self, verbose = False, count=20):
         self.verbose = verbose
-        self.kwargs = kwargs
-        self.bags = bags
-        self.boost = boost
-
+        self.count = count
         learner_list = []
-        for l in range(bags):
-            learner_list.append(learner(**kwargs))
+        for l in range(self.count):
+            learner_list.append(bl.BagLearner(lrl.LinRegLearner, kwargs={}, bags = 20, verbose = self.verbose))
         self.learners = learner_list
-        if verbose == True:
+        if self.verbose == True:
             self.get_learner_summary()
         		  	 		  		  		    	 		 		   		 		   			  	 		  		  		    	 		 		   		 		  
     def author(self):  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -32,33 +31,23 @@ class BagLearner(object):
             bag_y = Y[rand_data_slice]
             l.addEvidence(bag_x, bag_y)
 
-    
     def query(self,points):  		   	  			  	 		  		  		    	 		 		   		 		  
-        """  		   	  			  	 		  		  		    	 		 		   		 		  
+        """		   	  			  	 		  		  		    	 		 		   		 		  
         @summary: Estimate a set of test points given the model we built.  		   	  			  	 		  		  		    	 		 		   		 		  
         @param points: should be a numpy array with each row corresponding to a specific query.  		   	  			  	 		  		  		    	 		 		   		 		  
         @returns the estimated values according to the saved model.		   	  			  	 		  		  		    	 		 		   		 		  
         """
-        n=points.shape[0]
-        result = np.array([0]*n)[np.newaxis]
-        output = np.array([])
-        for i in range(0, self.bags):
-	        new_result = self.learners[i].query(points)
-	        new_result = new_result[np.newaxis]
-	        result = np.vstack((result , new_result))
-            
-        result=result[1:,:]
-	
-        for j in range(0, result.shape[1]):
-            m = stats.mode(result[:,j])
-            output = np.append( output, m[0][0])
-	
-        return output
+
+        dim = points.shape[0]
+        output = np.empty((dim, 20))
+        
+        for ith_col in range(self.count):
+            output[:,ith_col] = self.learners[ith_col].query(points)
+        return output.mean(1) 
     
     def get_learner_summary(self):
-        return "This is the Bag Learner"
-        	  			  	 		  		  		    	 		 		   		 		  
-        	   	  			  	 		  		  		    	 		 		   		 		  
+        return "This is the INSANE learner"
+		  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("Bag Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("Insane Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
