@@ -43,7 +43,8 @@ class InsaneLearner(object):
         
         for ith_col in range(self.count):
             output[:,ith_col] = self.learners[ith_col].query(points)
-        return output.mean(1) 
+        output = output.mean(1)
+        return output
     
     def get_learner_summary(self):
         return "This is the INSANE learner"
