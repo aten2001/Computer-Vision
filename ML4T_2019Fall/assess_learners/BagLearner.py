@@ -34,31 +34,16 @@ class BagLearner(object):
 
     
     def query(self,points):  		   	  			  	 		  		  		    	 		 		   		 		  
-        """  		   	  			  	 		  		  		    	 		 		   		 		  
-        @summary: Estimate a set of test points given the model we built.  		   	  			  	 		  		  		    	 		 		   		 		  
-        @param points: should be a numpy array with each row corresponding to a specific query.  		   	  			  	 		  		  		    	 		 		   		 		  
-        @returns the estimated values according to the saved model.		   	  			  	 		  		  		    	 		 		   		 		  
-        """
-        n=points.shape[0]
-        result = np.array([0]*n)[np.newaxis]
-        output = np.array([])
-        for i in range(0, self.bags):
-	        new_result = self.learners[i].query(points)
-	        new_result = new_result[np.newaxis]
-	        result = np.vstack((result , new_result))
-            
-        result=result[1:,:]
-	
-        for j in range(0, result.shape[1]):
-            m = stats.mode(result[:,j])
-            output = np.append( output, m[0][0])
-	
-        return output
+        results = []
+        for learner in self.learners:
+            results.append(learner.query(points))
+        results = np.array(results)
+        results = np.mean(results, 0)
+        return results
     
     def get_learner_summary(self):
         return "This is the Bag Learner"
-        	  			  	 		  		  		    	 		 		   		 		  
-        	   	  			  	 		  		  		    	 		 		   		 		  
+        	  			  	 		  		  		    	 		 		   		  	   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
     print("Bag Learner")  		   	  			  	 		  		  		    	 		 		   		 		  
