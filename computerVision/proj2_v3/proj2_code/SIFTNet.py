@@ -123,10 +123,7 @@ class HistogramLayer(nn.Module):
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
-
-        raise NotImplementedError('`HistogramLayer.forward` function in '
-            + '`student_sift.py` needs to be implemented')
-
+        pass
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
@@ -200,9 +197,9 @@ def angles_to_vectors_2d_pytorch(angles: torch.Tensor) -> torch.Tensor:
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-
-    raise NotImplementedError('`angles_to_vectors_2d_pytorch` needs to be '
-      + 'implemented')
+    cos_x = torch.cos(angles)
+    sin_y = torch.sin(angles)
+    angle_vectors = torch.stack((cos_x,sin_y), dim=1)
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -234,9 +231,16 @@ class SIFTOrientationLayer(nn.Module):
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
+        self.conv2d = nn.Conv2d(in_channels=2, 
+                                out_channels=10,
+                                kernel_size=1,
+                                bias=False,
+                                groups=1,
+                
+        )
 
-        raise NotImplementedError('`__init__` in `SIFTOrientationLayer` needs '
-          + 'to be implemented')
+        self.conv2d.weight = self.get_orientation_bin_weights()
+        
 
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -265,13 +269,24 @@ class SIFTOrientationLayer(nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
 
-        raise NotImplementedError('`get_orientation_bin_weights` needs to be '
-          + 'implemented')
-
+        weights = torch.Tensor([
+                    np.pi/8,
+                    3*np.pi/8,
+                    5*np.pi/8,
+                    7*np.pi/8,
+                    9*np.pi/8,
+                    11*np.pi/8,
+                    13*np.pi/8,
+                    15*np.pi/8,
+                    0,
+                    np.pi/2,
+                    
+        ])
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
-        return weight_param
+        
+        return nn.Parameter(angles_to_vectors_2d_pytorch(weights).view(10,2,1,1))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -283,7 +298,8 @@ class SIFTOrientationLayer(nn.Module):
         Returns:
         -   out: Torch tensor with shape (1,10,m,n)
         """
-        return self.layer(x)
+        
+        return self.conv2d(x)
 
 
 class SIFTNet(nn.Module):

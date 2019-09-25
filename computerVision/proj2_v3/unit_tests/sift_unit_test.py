@@ -175,6 +175,7 @@ def test_SIFTOrientationLayer():
 			]
 		])
 	dot_products = so_layer(im_grads)
+	print(dot_products.squeeze())
 
 	# Ground truth (10,4) tensor, with 10 values for each of the 4 pixels.
 	gt_dot_products = torch.tensor(
