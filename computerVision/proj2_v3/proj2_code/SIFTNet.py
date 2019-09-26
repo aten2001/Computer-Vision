@@ -399,9 +399,18 @@ def get_sift_subgrid_coords(x_center: int, y_center: int):
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`get_sift_subgrid_coords` needs to be '
-      + 'implemented')
+    x_grid = []
+    y_grid = []
 
+    start_x = x_center - 6
+    start_y = y_center - 6
+    for i in range(start_y, y_center + 8, 4):
+        for j in range(start_x, y_center + 8, 4):
+            x_grid.append(j)
+            y_grid.append(i)
+            
+    x_grid = np.asarray(x_grid)
+    y_grid = np.asarray(y_grid)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
