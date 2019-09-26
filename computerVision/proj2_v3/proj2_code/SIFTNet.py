@@ -123,7 +123,22 @@ class HistogramLayer(nn.Module):
         #######################################################################
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
-        pass
+        
+        #4d gradient magnitude is the inputs
+        #4d binary occupancy tensor?
+
+        binary_occ = torch.zeros_like(cosines)
+        per_px_histogram = torch.zeros((1,8,x.shape[2],x.shape[3]))
+
+        for i in range(x.shape[2]):
+            for j in range(x.shape[3]):
+                max_idx = torch.argmax(x[0,:8,i,j])
+                binary_occ[0, max_idx, i, j] = 1
+                grad = torch.norm(im_grads[:,:,i,j])
+                per_px_histogram[0,max_idx,i,j] = torch.mul(binary_occ[0, max_idx, i, j], grad)
+    
+        
+
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
@@ -160,8 +175,17 @@ class SubGridAccumulationLayer(nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
 
-        raise NotImplementedError('`__init__ in `SubGridAccumulationLayer` '
-          + 'needs to be implemented')
+        self.layer = nn.Conv2d(in_channels=8, 
+                                out_channels=8,
+                                kernel_size=4,
+                                bias=False,
+                                padding=(2, 2),
+                                padding_mode='zeros',
+                                groups=8,
+                
+        )
+
+        self.layer.weight = nn.Parameter(torch.ones((8,1,4,4)))
 
         #######################################################################
         #                           END OF YOUR CODE                          #
@@ -285,8 +309,8 @@ class SIFTOrientationLayer(nn.Module):
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
-        
-        return nn.Parameter(angles_to_vectors_2d_pytorch(weights).view(10,2,1,1))
+        weights = angles_to_vectors_2d_pytorch(weights).view(10,2,1,1)
+        return nn.Parameter(weights)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -324,8 +348,16 @@ class SIFTNet(nn.Module):
         # TODO: YOUR CODE HERE                                                #
         #######################################################################
 
-        raise NotImplementedError('`__init__` in `SIFTNet` needs to be '
-          + 'implemented')
+        sift_orientation_layer = SIFTOrientationLayer()
+        image_gradient_layer = ImageGradientsLayer()
+        historgram_layer = HistogramLayer()
+        sub_grid_layer = SubGridAccumulationLayer()
+        
+        self.net = nn.Sequential(image_gradient_layer, 
+                                sift_orientation_layer,
+                                historgram_layer,
+                                sub_grid_layer,
+                                )
 
         #######################################################################
         #                           END OF YOUR CODE                          #
