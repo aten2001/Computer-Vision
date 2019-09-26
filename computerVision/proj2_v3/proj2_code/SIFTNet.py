@@ -402,10 +402,10 @@ def get_sift_subgrid_coords(x_center: int, y_center: int):
     x_grid = []
     y_grid = []
 
-    start_x = x_center - 6
-    start_y = y_center - 6
-    for i in range(start_y, y_center + 8, 4):
-        for j in range(start_x, y_center + 8, 4):
+    start_x = int(x_center) - 6
+    start_y = int(y_center) - 6
+    for i in range(int(start_y), int(y_center) + 8, 4):
+        for j in range(int(start_x), int(y_center) + 8, 4):
             x_grid.append(j)
             y_grid.append(i)
             
@@ -447,8 +447,25 @@ def get_siftnet_features(img_bw: torch.Tensor, x: np.ndarray, y: np.ndarray) -> 
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`get_siftnet_features` needs to be implemented')
+    #img after running through net is [1,8, 17, 17]
+    features = net(img_bw)
+    neighborhoods = []
+    for i in range(x.shape[0]):
+        neighborhoods.append(get_sift_subgrid_coords(x[i], y[i]))
 
+    
+    k = x.shape[0]
+    fvs = np.zeros((k, 128))
+    for index,neighborhood in enumerate(neighborhoods):
+        n = features[0, :, neighborhood[0], neighborhood[1]]
+        n = n.detach().numpy()
+        n = np.reshape(n, (128,))
+        fvs[index] = n
+
+    fvs_tensor = torch.tensor(fvs)
+    fvs_tensor = torch.nn.functional.normalize(fvs_tensor)
+    fvs = fvs_tensor.detach().numpy()
+    fvs = fvs ** 0.9
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################

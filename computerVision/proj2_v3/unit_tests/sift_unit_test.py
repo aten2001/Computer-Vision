@@ -298,6 +298,9 @@ def test_get_siftnet_features():
 	assert np.allclose(features.sum(), 22.039, atol=1)
 	assert features.shape == (4, 128)
 
+	print(features)
+	print(features.sum())
+
 	gt_feat_crop = np.array(
 		[
 			[0.28135952, 0.20184263],
