@@ -456,39 +456,29 @@ def remove_border_vals(img, x: torch.Tensor, y: torch.Tensor, c: torch.Tensor) -
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-    """x_2 = x.clone()
+    x_2 = x.clone()
     y_2 = y.clone()
     c_2 = c.clone()
-
+    xs = []
+    ys = []
+    cs_list = []
     for i in range(len(x)):
-        if x[i].item() < 7 or x[i].item() >= img.shape[3] - 8:
-            x_2 = torch.cat((x_2[:i], x_2[i+1:]))
-            y_2 = torch.cat((y_2[:i], y_2[i+1:]))
-            c_2 = torch.cat((c_2[:i], c_2[i+1:]))
-        elif y[i].item() < 7 or y[i].item() >= img.shape[2] - 8:
-            x_2 = torch.cat((x_2[:i], x_2[i+1:]))
-            y_2 = torch.cat((y_2[:i], y_2[i+1:]))
-            c_2 = torch.cat((c_2[:i], c_2[i+1:]))
+        if ((x[i].item() < (img.shape[3] -8 ) and (y[i].item() < (img.shape[2] - 8)) and y[i].item() > 7)):
+            xs.append(x[i].item())
+            ys.append(y[i].item())
+            cs_list.append(c[i].item())
+    
+    to_tensor = [xs, ys, cs_list]
+    for l in range(len(to_tensor)):
+        if l == 0:
+            x = torch.Tensor(to_tensor[0])
+        elif l == 1:
+            y = torch.Tensor(to_tensor[1])
+        else:
+            c = torch.Tensor(to_tensor[2])
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
-
-    x = x_2
-    y = y_2
-    c = c_2"""
-    x_max = img.shape[3]
-    y_max = img.shape[2]
-    x_list = []
-    y_list = []
-    cs_list = []
-    for i in range(len(x)):
-        if ((x[i].item() < (x_max -1) -7 ) and (y[i].item() 
-        < (y_max - 1) - 7 and y[i].item() > 7)):
-            x_list.append(x[i].item())
-            y_list.append(y[i].item())
-            cs_list.append(c[i].item())
-    x = torch.Tensor(x_list)
-    y = torch.Tensor(y_list)
-    c = torch.Tensor(cs_list)
 
     return x, y, c
