@@ -397,9 +397,9 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     for i in range(len(non_zero)):
         #x_vals.append(pair[2])
         #y_vals.append(pair[3])
-        x_val = non_zero[i][2].item()
-        y_val = non_zero[i][3].item()
-        score = R[0][0][x_val][y_val].item()
+        x_val = non_zero[i][3].item()
+        y_val = non_zero[i][2].item()
+        score = R[0][0][y_val][x_val].item() #x_val y_val
         point = (x_val,y_val)
         point_score_dict.update( {point: score})
 
@@ -410,8 +410,8 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     confidences = []
 
     for sorted_pair in sorted_point_score_dict:
-        x.append(sorted_pair[0][1])
-        y.append(sorted_pair[0][0])
+        x.append(sorted_pair[0][0]) #01
+        y.append(sorted_pair[0][1]) #10
         confidences.append(sorted_pair[1])
     
     x = torch.Tensor(x)
