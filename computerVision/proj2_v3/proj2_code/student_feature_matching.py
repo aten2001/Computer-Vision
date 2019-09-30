@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 def compute_feature_distances(features1, features2):
@@ -20,8 +21,32 @@ def compute_feature_distances(features1, features2):
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`match_features` function in ' +
-        '`student_feature_matching.py` needs to be implemented')
+    x = features1
+    y = features2
+    n = x.shape[0]
+    m = y.shape[0]
+    dist_x = np.zeros((n,))
+    dist_y = np.zeros((m,))
+
+    """xT = np.matmul(np.transpose(x),x)
+    print(xT.shape)
+    yT = np.matmul(np.transpose(y), y)
+    print(yT.shape)
+    dists = np.zeros((x.shape[0], y.shape[0]))
+
+    xT = np.divide(xT, x.shape[0])
+    yT = np.divide(yT, y.shape[0])
+
+    norm = np.linalg.norm(xT - yT)
+
+    dists = np.tile(norm, (x.shape[0], y.shape[0]))"""
+
+    print(x.shape)
+    
+    d0 = np.subtract.outer(x[:,0], y[:,0])
+    d1 = np.subtract.outer(x[:,1], y[:,1])
+    dists = np.hypot(d0,d1)
+    
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -49,10 +74,6 @@ def match_features(features1, features2, x1, y1, x2, y2):
       features, where feat_dim denotes the feature dimensionality
     - features2: A numpy array of shape (m,feat_dim) representing a second
       set of features (m not necessarily equal to n)
-    - x1: A numpy array of shape (n,) containing the x-locations of features1
-    - y1: A numpy array of shape (n,) containing the y-locations of features1
-    - x2: A numpy array of shape (m,) containing the x-locations of features2
-    - y2: A numpy array of shape (m,) containing the y-locations of features2
 
     Returns:
     - matches: A numpy array of shape (k,2), where k is the number of matches.
@@ -68,11 +89,30 @@ def match_features(features1, features2, x1, y1, x2, y2):
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
 
-    raise NotImplementedError('`match_features` function in ' +
-        '`student_feature_matching.py` needs to be implemented')
+    distances = compute_feature_distances(features1, features2)
+  
+    m = []
+    confidences = []
+    for i in range(len(features1)):
+      d = distances[i]
+      fb1 = np.argsort(d)[0]
+      fb2 = np.argsort(d)[1]
+      d1 = d[fb1]
+      d2 = d[fb2]
+      score = (d1 / d2) 
+      if score < 0.8:
+        m.append((i, fb1))
+        confidences.append(score)
+    
+    k = len(m)
+    matches = np.zeros((k,2), dtype=int)
+    
+   
+    for i in range(len(m)):
+      matches[i][0] = m[i][0]
+      matches[i][1] = m[i][1]
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
-
     return matches, confidences

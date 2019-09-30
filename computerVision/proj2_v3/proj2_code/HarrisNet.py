@@ -397,9 +397,9 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     for i in range(len(non_zero)):
         #x_vals.append(pair[2])
         #y_vals.append(pair[3])
-        x_val = non_zero[i][2].item()
-        y_val = non_zero[i][3].item()
-        score = R[0][0][x_val][y_val].item()
+        x_val = non_zero[i][3].item()
+        y_val = non_zero[i][2].item()
+        score = R[0][0][y_val][x_val].item() #x_val y_val
         point = (x_val,y_val)
         point_score_dict.update( {point: score})
 
@@ -410,8 +410,8 @@ def get_interest_points(image: torch.Tensor, num_points: int = 4500) -> Tuple[to
     confidences = []
 
     for sorted_pair in sorted_point_score_dict:
-        x.append(sorted_pair[0][1])
-        y.append(sorted_pair[0][0])
+        x.append(sorted_pair[0][0]) #01
+        y.append(sorted_pair[0][1]) #10
         confidences.append(sorted_pair[1])
     
     x = torch.Tensor(x)
@@ -456,39 +456,29 @@ def remove_border_vals(img, x: torch.Tensor, y: torch.Tensor, c: torch.Tensor) -
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-    """x_2 = x.clone()
+    x_2 = x.clone()
     y_2 = y.clone()
     c_2 = c.clone()
-
+    xs = []
+    ys = []
+    cs_list = []
     for i in range(len(x)):
-        if x[i].item() < 7 or x[i].item() >= img.shape[3] - 8:
-            x_2 = torch.cat((x_2[:i], x_2[i+1:]))
-            y_2 = torch.cat((y_2[:i], y_2[i+1:]))
-            c_2 = torch.cat((c_2[:i], c_2[i+1:]))
-        elif y[i].item() < 7 or y[i].item() >= img.shape[2] - 8:
-            x_2 = torch.cat((x_2[:i], x_2[i+1:]))
-            y_2 = torch.cat((y_2[:i], y_2[i+1:]))
-            c_2 = torch.cat((c_2[:i], c_2[i+1:]))
+        if ((x[i].item() < (img.shape[3] -8 ) and (y[i].item() < (img.shape[2] - 8)) and y[i].item() > 7)):
+            xs.append(x[i].item())
+            ys.append(y[i].item())
+            cs_list.append(c[i].item())
+    
+    to_tensor = [xs, ys, cs_list]
+    for l in range(len(to_tensor)):
+        if l == 0:
+            x = torch.Tensor(to_tensor[0])
+        elif l == 1:
+            y = torch.Tensor(to_tensor[1])
+        else:
+            c = torch.Tensor(to_tensor[2])
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
-
-    x = x_2
-    y = y_2
-    c = c_2"""
-    x_max = img.shape[3]
-    y_max = img.shape[2]
-    x_list = []
-    y_list = []
-    cs_list = []
-    for i in range(len(x)):
-        if ((x[i].item() < (x_max -1) -7 ) and (y[i].item() 
-        < (y_max - 1) - 7 and y[i].item() > 7)):
-            x_list.append(x[i].item())
-            y_list.append(y[i].item())
-            cs_list.append(c[i].item())
-    x = torch.Tensor(x_list)
-    y = torch.Tensor(y_list)
-    c = torch.Tensor(cs_list)
 
     return x, y, c

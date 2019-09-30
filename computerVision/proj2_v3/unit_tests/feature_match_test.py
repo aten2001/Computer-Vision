@@ -30,6 +30,7 @@ def test_compute_dists():
             [0.26101724, 1.58656169, 1.98271985, 1.21742762]
         ])
     inter_distances = compute_feature_distances(feats1, feats2)
+    print(inter_distances)
     assert inter_distances.shape[0] == 3
     assert inter_distances.shape[1] == 4
     assert np.allclose(dists, inter_distances, atol = 1e-03)
@@ -70,6 +71,8 @@ def test_feature_matching():
             [3,1]
         ])
     result, confidences = match_features(feats1, feats2, x1, y1, x2, y2)
+    print(matches)
+    print(result)
     assert np.array_equal(matches, result[np.argsort(result[:, 0])])
 
 
