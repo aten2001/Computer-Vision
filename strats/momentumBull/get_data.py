@@ -4,6 +4,7 @@ import pickle
 import requests
 import datetime
 import os
+import time
 
 end = datetime.datetime.today()
 start = datetime.date(end.year-15,1,1)
@@ -39,17 +40,24 @@ def get_sp400():
 def generate_csv(stocks):
     end = datetime.datetime.today()
     start = datetime.date(end.year-15,1,1)
-    for stock in stocks:
-        if not os.path.exists('data/{}.csv'.format(stock)):
-            df = web.DataReader(stock, 'yahoo', start, end)
+    for stonk in stocks:
+        if not os.path.exists('data/{}.csv'.format(stonk)):
+            print("Getting {} data".format(stonk))
+            try:
+                df = web.DataReader(stonk, 'yahoo', start, end)
+            except:
+                print("Could not find data for {}".format(stonk)) 
+                continue 
             df.reset_index(inplace=True)
             df.set_index("Date", inplace=True)
-            df.to_csv('data/{}.csv'.format(stock))
+            df.to_csv('data/{}.csv'.format(stonk))
         else:
-            print('Already have {}'.format(stock))
+            print('Already have {}'.format(stonk))
 
 if __name__ == "__main__":
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_400_companies"
+    start_time = time.time()
     sp400tickers = get_sp400()
     sp500Tickers = get_sp500()
     generate_csv(sp400tickers)
+    print("Generated 500 csv in {}".format(time.time() - start_time))
