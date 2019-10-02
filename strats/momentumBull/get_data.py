@@ -5,14 +5,9 @@ import requests
 import datetime
 import os
 
-#sp500 url: http://en.wikipedia.org/wiki/List_of_S%26P_500_companies
-#sp400 url: https://en.wikipedia.org/wiki/List_of_S%26P_400_companies
-
-
 end = datetime.datetime.today()
 start = datetime.date(end.year-15,1,1)
  
-
 def get_sp500():
     url = "http://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
     resp = requests.get(url)
