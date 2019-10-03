@@ -40,6 +40,7 @@ def get_sp400():
 def generate_csv(stocks):
     end = datetime.datetime.today()
     start = datetime.date(end.year-15,1,1)
+    count = 0
     for stonk in stocks:
         if not os.path.exists('data/{}.csv'.format(stonk)):
             print("Getting {} data".format(stonk))
@@ -50,14 +51,16 @@ def generate_csv(stocks):
                 continue 
             df.reset_index(inplace=True)
             df.set_index("Date", inplace=True)
+            count = count + 1
             df.to_csv('data/{}.csv'.format(stonk))
         else:
             print('Already have {}'.format(stonk))
+    return count
 
 if __name__ == "__main__":
     url = "https://en.wikipedia.org/wiki/List_of_S%26P_400_companies"
     start_time = time.time()
     sp400tickers = get_sp400()
-    sp500Tickers = get_sp500()
-    generate_csv(sp400tickers)
-    print("Generated 500 csv in {}".format(time.time() - start_time))
+    sp500tickers = get_sp500()
+    count = generate_csv(sp500tickers)
+    print("Generated {} csv in {}".format(count, (time.time() - start_time)))
