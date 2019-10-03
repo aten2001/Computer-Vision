@@ -6,9 +6,6 @@ import datetime
 import os
 import time
 
-end = datetime.datetime.today()
-start = datetime.date(end.year-15,1,1)
- 
 def get_sp500():
     url = "http://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
     resp = requests.get(url)
@@ -39,7 +36,7 @@ def get_sp400():
 
 def generate_csv(stocks):
     end = datetime.datetime.today()
-    start = datetime.date(end.year-15,1,1)
+    start = datetime.date(end.year-1,1,1)
     count = 0
     for stonk in stocks:
         if not os.path.exists('data/{}.csv'.format(stonk)):
