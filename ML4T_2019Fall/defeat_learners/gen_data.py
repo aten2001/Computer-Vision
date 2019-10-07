@@ -30,7 +30,7 @@ import math
   		   	  			  	 		  		  		    	 		 		   		 		  
 # this function should return a dataset (X and Y) that will work  		   	  			  	 		  		  		    	 		 		   		 		  
 # better for linear regression than decision trees  		   	  			  	 		  		  		    	 		 		   		 		  
-def best4LinReg(seed=1489683273):  		   	  			  	 		  		  		    	 		 		   		 		  
+def best4LinReg(seed=1489683274):  		   	  			  	 		  		  		    	 		 		   		 		  
     np.random.seed(seed)
     samples = 10
     cols = 2
@@ -38,12 +38,13 @@ def best4LinReg(seed=1489683273):
     Y = 0.5*(X[:, 0] + X[:,0]) + 2	  			  	 		  		  		    	 		 		   		 		  
     return X, Y  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-def best4DT(seed=1489683273):  		   	  			  	 		  		  		    	 		 		   		 		  
+def best4DT(seed=1489683274):  		   	  			  	 		  		  		    	 		 		   		 		  
     np.random.seed(seed)  		   	  			  	 		  		  		    	 		 		   		 		  
     samples = 10
     cols = 2
     X = np.random.normal(size=(samples, cols))
-    Y = np.exp((X[:, 0] + X[:,0]) ** 3) 	 		  		  		    	 		 		   		 		  
+    #Y = np.exp((X[:, 0] + X[:,0]) ** 3)
+    Y = np.random.randint(5, size=10) 	 		  		  		    	 		 		   		 		  
     return X, Y  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 def author():  		   	  			  	 		  		  		    	 		 		   		 		  
