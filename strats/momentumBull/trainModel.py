@@ -107,9 +107,9 @@ def train_test(ticker):
     
     clf.fit(X_train, y_train)
     confidence = clf.score(X_test, y_test)
-    #print('accuracy:', confidence)
+    print('accuracy:', confidence)
     predictions = clf.predict(X_test)
-    #print('predicted class counts:', Counter(predictions))
+    print('predicted class counts:', Counter(predictions))
     #print()
     #print()
     
