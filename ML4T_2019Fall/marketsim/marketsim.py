@@ -30,33 +30,83 @@ import numpy as np
 import datetime as dt  		   	  			  	 		  		  		    	 		 		   		 		  
 import os  		   	  			  	 		  		  		    	 		 		   		 		  
 from util import get_data, plot_data  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
+def author():
+    return 'shollister7'
+
 def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, commission=9.95, impact=0.005):  		   	  			  	 		  		  		    	 		 		   		 		  
     # this is the function the autograder will call to test your code  		   	  			  	 		  		  		    	 		 		   		 		  
     # NOTE: orders_file may be a string, or it may be a file object. Your  		   	  			  	 		  		  		    	 		 		   		 		  
     # code should work correctly with either input  		   	  			  	 		  		  		    	 		 		   		 		  
     # TODO: Your code here  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-    # In the template, instead of computing the value of the portfolio, we just  		   	  			  	 		  		  		    	 		 		   		 		  
-    # read in the value of IBM over 6 months  		   	  			  	 		  		  		    	 		 		   		 		  
-    start_date = dt.datetime(2008,1,1)  		   	  			  	 		  		  		    	 		 		   		 		  
-    end_date = dt.datetime(2008,6,1)  		   	  			  	 		  		  		    	 		 		   		 		  
-    portvals = get_data(['IBM'], pd.date_range(start_date, end_date))  		   	  			  	 		  		  		    	 		 		   		 		  
-    portvals = portvals[['IBM']]  # remove SPY  		   	  			  	 		  		  		    	 		 		   		 		  
-    rv = pd.DataFrame(index=portvals.index, data=portvals.values)
-
+    #Load in:
+    # - orders
+    # - dates
+    # - list of stocks to call get_data on
     orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'] ).sort_index()
     stocks = orders['Symbol'].unique().tolist()
-    dates = orders.index
+    start_date = orders.index[0]
+    end_date = orders.index[-1]
+    dates=pd.date_range(start_date, end_date)
     orders.fillna(method='ffill', inplace=True)
     orders.fillna(method='backfill', inplace=True)
-    
+
+    #get data and fill na
     data = get_data(stocks, dates)
-    print(data)
-    print(orders)
-    print(dates)	   	  			  	 		  		  		    	 		 		   		 		  
+    data.fillna(method='ffill', inplace=True)
+    data.fillna(method='backfill', inplace=True)
+    data["cash_change"] = 1.0
+    
+    #df that has percent change in number of shares by day for each asset
+    #share_chg = pd.DataFrame(np.zeros((data.shape)), data.index, data.columns)
+    share_chg = data.copy()
+    for col in share_chg.columns:
+        share_chg[col].values[:] = 0
+    rows = orders.iterrows()
+    for idx, row in rows:
+        ticker = row[0]
+        ord_type = row[1]
+        shares = row[2]
+        value = data.loc[idx, ticker] * shares
+        cost = value * impact + commission
+
+        if ord_type == "BUY":
+            curr_shares = share_chg.loc[idx, ticker]
+            curr_cash = share_chg.loc[idx, "cash_change"]
+            share_chg.loc[idx, ticker] = curr_shares + shares
+            share_chg.loc[idx, "cash_change"] = curr_cash - (value + cost)
+        
+        elif ord_type == "SELL":
+            share_chg.loc[idx, row["Symbol"]] = share_chg.loc[idx, row["Symbol"]] -row["Shares"]
+            share_chg.loc[idx, "cash_change"] = share_chg.loc[idx, "cash_change"] + value - cost
+
+    #print(share_chg)
+
+    df_holdings = pd.DataFrame(np.zeros((data.shape)), data.index, data.columns)
+    for row_count in range(len(df_holdings)):
+     
+        if row_count == 0:
+            df_holdings.iloc[0, :-1] = share_chg.iloc[0, :-1].copy()
+            df_holdings.iloc[0, -1] = share_chg.iloc[0, -1] + start_val
+  
+        else:
+            df_holdings.iloc[row_count] = df_holdings.iloc[row_count-1] + share_chg.iloc[row_count]
+        row_count += 1
+
+
+    df_value = data * df_holdings
+    
+    
+    portvals = pd.DataFrame(df_value.sum(axis=1), df_value.index, ["port_val"])
+    rv = pd.DataFrame(index=portvals.index, data=portvals.values)
+
+    #print(data)
+    #print(data)
+    #print(orders)
+    #print(dates)	   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-    return rv  		   	  			  	 		  		  		    	 		 		   		 		  
+    return rv 		   	  			  	 		  		  		    	 		 		   		 		  
     return portvals  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 def test_code():  		   	  			  	 		  		  		    	 		 		   		 		  
