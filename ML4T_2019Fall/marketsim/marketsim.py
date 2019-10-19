@@ -58,11 +58,15 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
     data.fillna(method='backfill', inplace=True)
     data["cash_change"] = 1.0
     
-    #df that has percent change in number of shares by day for each asset
+    #df that has change in number of shares by day for each asset
+    # df also includes change in cash
+    # make another df called port to aggregate portfolio
     #share_chg = pd.DataFrame(np.zeros((data.shape)), data.index, data.columns)
     share_chg = data.copy()
+    port = data.copy()
     for col in share_chg.columns:
         share_chg[col].values[:] = 0
+        port[col].values[:] = 0
     rows = orders.iterrows()
     for idx, row in rows:
         ticker = row[0]
@@ -70,42 +74,30 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
         shares = row[2]
         value = data.loc[idx, ticker] * shares
         cost = value * impact + commission
+        curr_shares = share_chg.loc[idx, ticker]
+        curr_cash = share_chg.loc[idx, "cash_change"]
 
-        if ord_type == "BUY":
-            curr_shares = share_chg.loc[idx, ticker]
-            curr_cash = share_chg.loc[idx, "cash_change"]
+        if ord_type == "SELL":
+            share_chg.loc[idx, ticker] = curr_shares - shares
+            share_chg.loc[idx, "cash_change"] = curr_cash + (value - cost)
+        elif ord_type == "BUY":
             share_chg.loc[idx, ticker] = curr_shares + shares
             share_chg.loc[idx, "cash_change"] = curr_cash - (value + cost)
-        
-        elif ord_type == "SELL":
-            share_chg.loc[idx, row["Symbol"]] = share_chg.loc[idx, row["Symbol"]] -row["Shares"]
-            share_chg.loc[idx, "cash_change"] = share_chg.loc[idx, "cash_change"] + value - cost
-
-    #print(share_chg)
-
-    df_holdings = pd.DataFrame(np.zeros((data.shape)), data.index, data.columns)
-    for row_count in range(len(df_holdings)):
-     
-        if row_count == 0:
-            df_holdings.iloc[0, :-1] = share_chg.iloc[0, :-1].copy()
-            df_holdings.iloc[0, -1] = share_chg.iloc[0, -1] + start_val
-  
+    
+    port_rows = port.iterrows()
+    port.iloc[0, :-1] = share_chg.iloc[0, :-1].copy()
+    port.iloc[0, -1] = share_chg.iloc[0, -1] + start_val
+    for count, r in enumerate(port_rows):
+        if count == 0:
+            continue
         else:
-            df_holdings.iloc[row_count] = df_holdings.iloc[row_count-1] + share_chg.iloc[row_count]
-        row_count += 1
+            port.iloc[count] = port.iloc[count-1] + share_chg.iloc[count]
 
-
-    df_value = data * df_holdings
-    
-    
-    portvals = pd.DataFrame(df_value.sum(axis=1), df_value.index, ["port_val"])
+    totals = data * port
+    data = totals.sum(axis=1)
+    portvals = pd.DataFrame(data, index= totals.index, columns = ["portfolio_totals"])
     rv = pd.DataFrame(index=portvals.index, data=portvals.values)
-
-    #print(data)
-    #print(data)
-    #print(orders)
-    #print(dates)	   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+	  			  	 		  		  		    	 		 		   		 		    		   	  			  	 		  		  		    	 		 		   		 		  
     return rv 		   	  			  	 		  		  		    	 		 		   		 		  
     return portvals  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
