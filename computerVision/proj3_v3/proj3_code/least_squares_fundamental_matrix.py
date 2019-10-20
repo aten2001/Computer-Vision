@@ -35,7 +35,16 @@ def optimize(p0, x_0s, x_1s):
     
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    kwargs = {'pts2d' : pts2d, 'pts3d' : pts3d}
+    initial_guess = initial_guess.reshape((initial_guess.shape[0] * initial_guess.shape[1], ))
+    M = least_squares(objective_func, 
+                        initial_guess[:-1], 
+                        method='lm', 
+                        max_nfev=5000,
+                        verbose=2,
+                        kwargs=kwargs).x
+    M = np.append(M, 1)
+    M = M.view(dtype=np.float64).reshape((3,4))
     ##############################
 
     optimized_F = result.x

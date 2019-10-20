@@ -59,7 +59,6 @@ def projection(P: np.ndarray, points_3d: np.ndarray) -> np.ndarray:
     p_11_row = P[0]
     p_21_row = P[1]
     p_31_row = P[2]
-    
     projected_points_2d = np.zeros((points_3d.shape[0], 2))
     for i in range(points_3d.shape[0]):
         Xi_num = np.sum(np.multiply(p_11_row[:3],points_3d[i])) + p_11_row[3]

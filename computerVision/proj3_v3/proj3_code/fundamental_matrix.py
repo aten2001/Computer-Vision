@@ -25,7 +25,7 @@ def point_line_distance(line, point):
 
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    error = (a*u + b*v + c) / np.sqrt(a**2 + b**2)
     ##############################
 
     return error
@@ -63,7 +63,13 @@ def signed_point_line_errors(x_0s, F, x_1s):
 
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    for vec in range(len(x_1s)):
+        Fx1 = np.matmul(F, x_1s[vec])
+        F_tx0 = np.matmul(F.transpose(), x_0s[vec])
+        d_fx1 = point_line_distance(Fx1, x_0s[vec])
+        d_fx_t = point_line_distance(F_tx0, x_1s[vec])
+        errors.append(d_fx1)
+        errors.append(d_fx_t)
     ##############################
 
     return errors
