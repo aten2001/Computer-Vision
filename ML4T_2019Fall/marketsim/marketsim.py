@@ -83,19 +83,13 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
         elif ord_type == "BUY":
             share_chg.loc[idx, ticker] = curr_shares + shares
             share_chg.loc[idx, "cash_change"] = curr_cash - (value + cost)
-    
-    port_rows = port.iterrows()
-    port.iloc[0, :-1] = share_chg.iloc[0, :-1].copy()
-    port.iloc[0, -1] = share_chg.iloc[0, -1] + start_val
-    for count, r in enumerate(port_rows):
-        if count == 0:
-            continue
-        else:
-            port.iloc[count] = port.iloc[count-1] + share_chg.iloc[count]
 
-    totals = data * port
-    data = totals.sum(axis=1)
-    portvals = pd.DataFrame(data, index= totals.index, columns = ["portfolio_totals"])
+    port.iloc[0, :-1] = share_chg.iloc[0, :-1]
+    port.iloc[0, -1] = share_chg.iloc[0, -1] + start_val
+
+    for count in range(1, len(port.index)): port.iloc[count] = port.iloc[count-1] + share_chg.iloc[count]
+    port = (data * port).sum(axis = 1)
+    portvals = pd.DataFrame(port, index= port.index, columns = ["portfolio_totals"])
     rv = pd.DataFrame(index=portvals.index, data=portvals.values)
 	  			  	 		  		  		    	 		 		   		 		    		   	  			  	 		  		  		    	 		 		   		 		  
     return rv 		   	  			  	 		  		  		    	 		 		   		 		  
