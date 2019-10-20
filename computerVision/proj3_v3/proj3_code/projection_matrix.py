@@ -29,7 +29,13 @@ def objective_func(x, **kwargs):
     
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    #P*3d - 2d points
+    x = np.append(x,1)
+    P = x.reshape((3,4))
+    pts3d = kwargs.get('pts3d')
+    proj = projection(P, pts3d)
+    diff = proj - kwargs.get('pts2d')
+    diff = diff.reshape((diff.shape[0] * diff.shape[1], ))
     ##############################
       
     return diff
@@ -50,7 +56,22 @@ def projection(P: np.ndarray, points_3d: np.ndarray) -> np.ndarray:
     
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    p_11_row = P[0]
+    p_21_row = P[1]
+    p_31_row = P[2]
+    
+    projected_points_2d = np.zeros((points_3d.shape[0], 2))
+    for i in range(points_3d.shape[0]):
+        Xi_num = np.sum(np.multiply(p_11_row[:3],points_3d[i])) + p_11_row[3]
+        Xi_denom = np.sum(np.multiply(p_31_row[:3], points_3d[i])) + p_31_row[3]
+        Xi = Xi_num / Xi_denom
+        projected_points_2d[i][0] = Xi
+
+        Yi_num = np.sum(np.multiply(p_21_row[:3],points_3d[i])) + p_21_row[3]
+        Yi_denom = np.sum(np.multiply(p_31_row[:3], points_3d[i])) + p_31_row[3]
+        Yi = Yi_num / Yi_denom
+        projected_points_2d[i][1] = Yi
+
     ##############################
     
     return projected_points_2d
@@ -90,10 +111,19 @@ def estimate_camera_matrix(pts2d: np.ndarray,
     '''
 
     start_time = time.time()
-     
+    
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    kwargs = {'pts2d' : pts2d, 'pts3d' : pts3d}
+    initial_guess = initial_guess.reshape((initial_guess.shape[0] * initial_guess.shape[1], ))
+    M = least_squares(objective_func, 
+                        initial_guess[:-1], 
+                        method='lm', 
+                        max_nfev=5000,
+                        verbose=2,
+                        kwargs=kwargs).x
+    M = np.append(M, 1)
+    M = M.view(dtype=np.float64).reshape((3,4))
     ##############################
     
     print("Time since optimization start", time.time() - start_time)
