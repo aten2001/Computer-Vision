@@ -147,7 +147,9 @@ def decompose_camera_matrix(P: np.ndarray) -> (np.ndarray, np.ndarray):
     
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    KR = P[:, :3]
+    K= rq(KR)[0]
+    R = rq(KR)[1]
     ##############################
     
     return K, R
@@ -168,7 +170,12 @@ def calculate_camera_center(P: np.ndarray,
 
     ##############################
     # TODO: Student code goes here
-    raise NotImplementedError
+    
+    # p = K[R|t], cc = K^-1 * R_T^-1
+    KR_n = P[:, 3:]
+    cc = np.matmul((np.matmul(R_T.transpose(), np.linalg.inv(K))), KR_n)
+    cc = np.reshape(cc, (cc.shape[0] * cc.shape[1], ))
+    cc = cc * -1
     ##############################
 
     return cc
