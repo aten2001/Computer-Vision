@@ -114,48 +114,30 @@ def ransac_fundamental_matrix(x_0s, x_1s):
     """
     ##############################
     # TODO: Student code goes here
-    """best_F = np.zeros((3,3))
-    max_inliers = 0
-    inliers_x_0 = np.zeros((3,3))
-    inliers_x_1 = np.zeros((3,3))
-    num_iterations = calculate_num_ransac_iterations(.9, 9, 0.7)
-
-    for i in range(num_iterations):
-        random_x_idxs = np.random.choice(x_0s.shape[0], 9)
-        # random_x1s_idxs = np.random.choice(x_1s.shape[0], 9)
-        random_x0s = np.array([x_0s[i] for i in random_x_idxs])
-        random_x1s = np.array([x_1s[i] for i in random_x_idxs])
-        curr_fundamental_matrix = solve_F(random_x0s, random_x1s)
-        homo_x0s, homo_x1s = two_view_data.preprocess_data(x_0s, x_1s)
-        curr_inliers = find_inliers(homo_x0s, curr_fundamental_matrix, homo_x1s, 1)
-        if (curr_inliers.shape[0] > max_inliers):
-            max_inliers = curr_inliers.shape[0]
-            best_F = curr_fundamental_matrix
-            inliers_x_0 = np.array([x_0s[i] for i in curr_inliers])
-            inliers_x_1 = np.array([x_1s[i] for i in curr_inliers])"""
     best_model = np.zeros((3,3))
     inliers_x_0 = best_model.copy()
     inliers_x_1 = best_model.copy()
-    iterations = calculate_num_ransac_iterations(0.9, 9, 0.7)
+    iterations = calculate_num_ransac_iterations(0.98, 9, 0.98)
     num_inliers = 0
     for iteration in range(iterations):
         length = x_0s.shape[0]
-        possible_inliers = np.random.choice(length, 9)
-        p_x1s = []
+        possible_inliers = np.random.choice(length, int(length * 0.8))
         p_x0s = []
-        for p_inlier in possible_inliers:
-            p_x1s[p_inlier] = x_1s[p_inlier]
-            p_x0s[p_inlier] = x_0s[p_inlier]
+        p_x1s = []
+        for i in possible_inliers:
+            p_x0s.append(x_0s[i])
+            p_x1s.append(x_1s[i])
+        p_x0s = np.array(p_x0s)
+        p_x1s = np.array(p_x1s)      
         test_inliers = find_inliers(
              two_view_data.preprocess_data(x_0s, x_1s)[0],
              solve_F(p_x0s, p_x1s),
              two_view_data.preprocess_data(x_0s, x_1s)[1],
              1)
         count_curr_inliers = test_inliers.shape[0]
+        inliers_x_0 = np.array([x_0s[i] for i in test_inliers if (num_inliers < count_curr_inliers)])
+        inliers_x_1 = np.array([x_1s[i] for i in test_inliers if (num_inliers < count_curr_inliers)])
         if (num_inliers < count_curr_inliers):
-            for idx in test_inliers:
-                inliers_x_0[idx] = x_1s[idx]
-                inliers_x_1[idx] = x_0s[idx]
             best_model = solve_F(p_x0s, p_x1s)
             num_inliers = test_inliers.shape[0]
     best_F = best_model

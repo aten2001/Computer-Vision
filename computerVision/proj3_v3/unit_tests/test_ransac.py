@@ -30,8 +30,8 @@ def test_ransac_find_inliers():
               [-6.83245580e-07, -2.23634574e-08, 3.47641240e-03],
               [1.65302076e-04, -3.16334642e-03, -3.80986850e-02]]
     F = np.array(F)
-    x_1s = np.load('./data/inliers2_a.npy')
-    x_0s = np.load('./data/inliers2_b.npy')
+    x_1s = np.load('../data/inliers2_a.npy')
+    x_0s = np.load('../data/inliers2_b.npy')
     outliers = [1, 3, 4, 5, 10]
     for outlier in outliers:
         x_0s[outlier] += 3
@@ -47,8 +47,8 @@ def test_ransac_find_inliers():
 
 def test_ransac_fundamental_matrix_error():
 
-    points_a = np.load('./unit_tests/pointsa.npy')
-    points_b = np.load('./unit_tests/pointsb.npy')
+    points_a = np.load('../unit_tests/pointsa.npy')
+    points_b = np.load('../unit_tests/pointsb.npy')
     error_tolerance = 1
 
     F, inliers_x_0, inliers_x_1 = ransac_fundamental_matrix(points_a, points_b)
@@ -64,8 +64,8 @@ def test_ransac_fundamental_matrix_error():
 
 def test_ransac_fundamental_matrix_fit():
 
-    x_0s = np.load('./data/points2_a.npy')
-    x_1s = np.load('./data/points2_b.npy')
+    x_0s = np.load('../data/points2_a.npy')
+    x_1s = np.load('../data/points2_b.npy')
     error_tolerance = 20.0
 
     F, inliers_x_0, inliers_x_1 = ransac_fundamental_matrix(x_0s, x_1s)
