@@ -179,8 +179,8 @@ def test_with_epipolar_lines():
     # Rushmore
     #image1 = load_image('../data/schell1.jpg')
     #image2 = load_image('../data/schell2.jpg')
-    image1 = load_image('../data/standing1.jpg')
-    image2 = load_image('../data/standing2.jpg')
+    image1 = load_image('../data/selfie.jpg')
+    image2 = load_image('../data/selfie1.jpg')
 
     scale_factor = 0.5
     image1 = PIL_resize(image1, (int(image1.shape[1]*scale_factor), int(image1.shape[0]*scale_factor)))
