@@ -146,6 +146,8 @@ def ransac_fundamental_matrix(x_0s, x_1s):
         inliers_x_0 = np.array(inliers_x_0)
         inliers_x_1 = np.array(inliers_x_1)
         best_F = best_model
+        inliers_x_0 = np.array(inliers_x_0)
+        inliers_x_1 = np.array(inliers_x_1)
     ##############################
 
     return best_F, inliers_x_0, inliers_x_1
@@ -179,8 +181,8 @@ def test_with_epipolar_lines():
     # Rushmore
     #image1 = load_image('../data/schell1.jpg')
     #image2 = load_image('../data/schell2.jpg')
-    image1 = load_image('../data/selfie.jpg')
-    image2 = load_image('../data/selfie1.jpg')
+    image1 = load_image('../data/inside.jpg')
+    image2 = load_image('../data/inside1.jpg')
 
     scale_factor = 0.5
     image1 = PIL_resize(image1, (int(image1.shape[1]*scale_factor), int(image1.shape[0]*scale_factor)))
