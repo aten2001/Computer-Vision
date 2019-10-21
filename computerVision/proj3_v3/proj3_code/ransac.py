@@ -62,7 +62,7 @@ def find_inliers(x_0s, F, x_1s, threshold):
         line_T = np.matmul(F.transpose(), x_0s[idx])
         dist = fundamental_matrix.point_line_distance(line, x_0s[idx])
         dist2 = fundamental_matrix.point_line_distance(line_T, x_1s[idx])
-        if (dist + dist2 < 2* threshold): inliers.append(idx)
+        if (abs(dist) + abs(dist2) < 2 * threshold): inliers.append(idx)
 
     ##############################
 
@@ -114,36 +114,79 @@ def ransac_fundamental_matrix(x_0s, x_1s):
     """
     ##############################
     # TODO: Student code goes here
-    best_model = np.zeros((3,3))
+    """best_model = np.zeros((3,3))
     inliers_x_0 = best_model.copy()
     inliers_x_1 = best_model.copy()
     iterations = calculate_num_ransac_iterations(0.98, 9, 0.98)
     num_inliers = 0
     for iteration in range(iterations):
         length = x_0s.shape[0]
-        possible_inliers = np.random.choice(length, int(length * 0.8))
-        p_x0s = []
-        p_x1s = []
-        for i in possible_inliers:
-            p_x0s.append(x_0s[i])
-            p_x1s.append(x_1s[i])
-        p_x0s = np.array(p_x0s)
-        p_x1s = np.array(p_x1s)      
+        possible_inliers = np.random.choice(length, 9, replace=False)
+        #p_x0s = []
+        #p_x1s = []
+        #for i in possible_inliers:
+        #    p_x0s.append(x_0s[i])
+        #    p_x1s.append(x_1s[i])
+        #p_x0s = np.array(p_x0s)
+        #p_x1s = np.array(p_x1s)
+        p_x0s = np.array([x_0s[i] for i in possible_inliers])
+        p_x1s = np.array([x_1s[i] for i in possible_inliers])       
         test_inliers = find_inliers(
              two_view_data.preprocess_data(x_0s, x_1s)[0],
              solve_F(p_x0s, p_x1s),
              two_view_data.preprocess_data(x_0s, x_1s)[1],
              1)
         count_curr_inliers = test_inliers.shape[0]
-        inliers_x_0 = np.array([x_0s[i] for i in test_inliers if (num_inliers < count_curr_inliers)])
-        inliers_x_1 = np.array([x_1s[i] for i in test_inliers if (num_inliers < count_curr_inliers)])
+        #inliers_x_0 = np.array([x_0s[i] for i in test_inliers if (num_inliers < count_curr_inliers)])
+        #inliers_x_1 = np.array([x_1s[i] for i in test_inliers if (num_inliers < count_curr_inliers)])
+        inliers_x_0 = []
+        inliers_x_1 = []
         if (num_inliers < count_curr_inliers):
+            #for i in test_inliers:
+            #    inliers_x_0.append(x_0s[i])
+            #    inliers_x_1.append(x_1s[i])
+            inliers_x_0 = np.array([x_0s[i] for i in test_inliers])
+            inliers_x_1 = np.array([x_1s[i] for i in test_inliers])
             best_model = solve_F(p_x0s, p_x1s)
             num_inliers = test_inliers.shape[0]
     best_F = best_model
     inliers_x_1 = np.array(inliers_x_1)
-    inliers_x_0 = np.array(inliers_x_0)
+    inliers_x_0 = np.array(inliers_x_0)"""
+    best_F = np.zeros((3,3))
+    max_inliers = 0
+    
+    num_iterations = calculate_num_ransac_iterations(.98, 9, .98)
 
+    for i in range(num_iterations):
+        random_x_idxs = np.random.choice(x_0s.shape[0], 9, replace=False)
+        # random_x1s_idxs = np.random.choice(x_1s.shape[0], 9)
+        random_x0s = []
+        random_x1s = []
+        for idx in random_x_idxs:
+            random_x0s.append(x_0s[i])
+            random_x1s.append(x_1s[i])
+        random_x0s = np.array(random_x0s)
+        random_x1s = np.array(random_x1s)
+
+        curr_inliers = find_inliers(
+            two_view_data.preprocess_data(x_0s, x_1s)[0],
+            solve_F(random_x0s, random_x1s), 
+            two_view_data.preprocess_data(x_0s, x_1s)[1], 
+            1)
+
+        if (curr_inliers.shape[0] > max_inliers):
+            max_inliers = curr_inliers.shape[0]
+            best_F = solve_F(random_x0s, random_x1s)
+            inliers_x_0 = []
+            inliers_x_1 = []
+            for inlier in curr_inliers:
+                inliers_x_0.append(x_0s[inlier])
+                inliers_x_1.append(x_1s[inlier])
+               
+            #inliers_x_0 = np.array([x_0s[i] for i in curr_inliers])
+            #inliers_x_1 = np.array([x_1s[i] for i in curr_inliers])
+        inliers_x_0 = np.array(inliers_x_0)
+        inliers_x_1 = np.array(inliers_x_1)
     ##############################
 
     return best_F, inliers_x_0, inliers_x_1
