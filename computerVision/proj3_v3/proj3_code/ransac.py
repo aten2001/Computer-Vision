@@ -116,7 +116,7 @@ def ransac_fundamental_matrix(x_0s, x_1s):
     # TODO: Student code goes here
     best_model = np.zeros((3,3))
     num_inliers = 0
-    iterations = calculate_num_ransac_iterations(.97, 9, .89)
+    iterations = calculate_num_ransac_iterations(.97, 9, .68)
 
     for i in range(iterations):
         length = x_0s.shape[0]
