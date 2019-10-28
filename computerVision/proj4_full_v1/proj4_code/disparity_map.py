@@ -59,23 +59,19 @@ def calculate_disparity_map(left_img: torch.Tensor,
   b = block_size
   disparity_map = torch.zeros((H -  2*(block_size//2), W - 2*(block_size//2)))
   for i in range(block_size //2, H-block_size//2):
-    for j in range(block_size //2, W-block_size//2):
-        min_sim_error = 123123
+    for j in range(block_size //2, W-block_size//2):        
         for s in range(max_search_bound):
-            left_b = j - b//2 - s
-            left_b2 = j + b//2 - s
-            if (left_b2 < 0):
+            left_bound = j - b//2 - s
+            disps = []
+            patch1 = left_img[i-b//2:i+b//2, j-b//2:j+b//2]
+            if (left_bound < block_size //2):
+                patch2 = right_img[i-b//2:i+b//2, j-b//2:j+b//2]
                 break
             else:
-                patch1 = right_img[i-b//2:i+b//2, j-b//2:j+b//2]
-                patch2 = right_img[i-b//2:i+b//2, left_b:left_b2] 
-                sim_error = sim_measure_function(patch1, patch2)
-                if (sim_error < min_sim_error):
-                    min_sim_error = sim_error
-        left_img[i,j,:] = min_sim_error
-
-  
-
+                patch2 = right_img[i-b//2:i+b//2, j- b//2 - s:j + b//2 - s]
+        disps.append(sim_measure_function(patch1, patch2))
+        disparity_map[i - b // 2,  j - b//2] = torch.tensor(np.argmin(disps))
+        
   ############################################################################
   # Student code end
   ############################################################################
