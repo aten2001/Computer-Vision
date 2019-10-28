@@ -54,8 +54,17 @@ def calculate_disparity_map(left_img: torch.Tensor,
   ############################################################################
   # Student code begin
   ############################################################################
+  H = left_img.shape[0]
+  W = left_img.shape[1]
+  for i in range(block_size //2, H-block_size//2):
+      for j in range(block_size //2, W-block_size//2):
+          min_sim_error = 123123
+          for s in max_search_bound:
+              patch1 = ?
+              patch2 = ?
+              sim_error = sim_measure_function(patch1, patch2)
 
-  raise NotImplementedError('calculate_disparity_map not implemented')
+  
 
   ############################################################################
   # Student code end
