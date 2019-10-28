@@ -58,34 +58,30 @@ def generate_random_stereogram(im_size: Tuple[int, int, int] = (51, 51, 3), disp
 
   #generate left image
   img = torch.rand(H,W)
-  im_left = torch.stack((img, img, img), 0)
+  im_left = torch.stack((img, img, img), 2)
   
   #set the right image to copy of the second
   im_right = torch.clone(im_left)
 
   #move a block around the center block in the right image by 'disparity val' to the left
-  """for h in range(H//2 - H // 4, H//2 + H//4):
-    for w in range(W//2 - W//4, W // 2 + W // 4):
-      im_right[h,w - disparity,:] = im_right[h,w,:]
-      im_right[h,w,:] = torch.rand(1)[0]"""
   
   block_height = block_size[0]
   block_width = block_size[1]
-  """for channel in range(C):
-    i = H//2
-    j = W//2 - disparity
-    i_orig = H//2
-    j_orig = W//2
-    im_right[i: i + block_height, j: j + block_width, channel] = im_right[i_orig: i_orig + block_height, j_orig: j_orig + block_width, channel]
-    im_right[i_orig: i_orig + block_height, j_orig: j_orig + block_width, channel] = torch.rand(i_orig + block_height, j_orig + block_width)
-    """
-  for c in range(C):
+  
+  """for c in range(C):
     c_H = H // 2
     c_W = W // 2
     #test[H-H//2:H + H//2 + 1, W-W//2:W+W//2 + 1] = 1
     #test[H-H//2:H + H//2 + 1, W-W//2 - 3:W+W//2 + 1 - 3] = 1
     im_right[c_H - c_H // 2:c_H + c_H//2, c_W-c_W//2 - 3:c_W+c_W//2 + 1 - 3, c] = im_right[c_H - c_H // 2:c_H + c_H//2, c_W-c_W//2:c_W+c_W//2 + 1, c]
-    im_right[c_H - c_H // 2:c_H + c_H//2, c_W-c_W//2:c_W+c_W//2 + 1, c] = torch.rand((c_H, c_W))
+    im_right[c_H - c_H // 2:c_H + c_H//2, c_W-c_W//2:c_W+c_W//2 + 1, c] = torch.rand(block_size)"""
+
+  c_H = H // 2
+  c_W = W // 2
+  for i in range(c_H - c_H // 2, c_H+c_H//2):
+    for j in range(c_W - c_W // 2, c_W+c_W//2):
+      im_right[i, j - disparity, :] = im_right[i, j, :]
+      im_right[i, j, :] = torch.rand(1)[0]
 
   ############################################################################
   # Student code begin

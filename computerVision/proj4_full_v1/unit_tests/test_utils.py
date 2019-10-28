@@ -15,6 +15,10 @@ def test_generate_random_stereogram():
   left_img, right_img = generate_random_stereogram(
       im_size=(H, W, 2), disparity=disparity_val)
 
+  print(left_img)
+  print(right_img)
+  print("left_img.shape {}".format(left_img.shape))
+  print("right_img.shape {}".format(right_img.shape))
   # assert that they are same in all the channels
   for ch_idx in range(1, left_img.shape[2]):
     assert torch.nonzero(left_img[:, :, 0] !=
