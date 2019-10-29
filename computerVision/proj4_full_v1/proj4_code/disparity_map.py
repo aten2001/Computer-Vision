@@ -57,21 +57,26 @@ def calculate_disparity_map(left_img: torch.Tensor,
   H = left_img.shape[0]
   W = left_img.shape[1]
   b = block_size
+  
+  #print(left_img)
   disparity_map = torch.zeros((H -  2*(block_size//2), W - 2*(block_size//2)))
   for i in range(block_size //2, H-block_size//2):
-    for j in range(block_size //2, W-block_size//2):        
+    for j in range(block_size //2, W-block_size//2):
+        disps = []     
         for s in range(max_search_bound):
             left_bound = j - b//2 - s
-            disps = []
-            patch1 = left_img[i-b//2:i+b//2, j-b//2:j+b//2]
+            patch1 = left_img[i-b//2:i+b//2 + 1, j-b//2:j+b//2 + 1]
             if (left_bound < block_size //2):
-                patch2 = right_img[i-b//2:i+b//2, j-b//2:j+b//2]
+                patch2 = right_img[i-b//2:i+b//2 + 1, j-b//2:j+b//2 + 1]
+                disps.append(sim_measure_function(patch1, patch2))
                 break
             else:
-                patch2 = right_img[i-b//2:i+b//2, j- b//2 - s:j + b//2 - s]
-        disps.append(sim_measure_function(patch1, patch2))
+                patch2 = right_img[i-b//2:i+b//2 + 1, j- b//2 - s:j + b//2 - s + 1]
+                disps.append(sim_measure_function(patch1, patch2))
+        #disps.append(sim_measure_function(patch1, patch2))
+        disps = np.array(disps)
+        #print(disps)
         disparity_map[i - b // 2,  j - b//2] = torch.tensor(np.argmin(disps))
-        
   ############################################################################
   # Student code end
   ############################################################################
@@ -114,12 +119,43 @@ def calculate_cost_volume(left_img: torch.Tensor,
   #placeholder
   H = left_img.shape[0]
   W = right_img.shape[1]
+
   cost_volume = torch.zeros(H, W, max_disparity)
   ############################################################################
   # Student code begin
   ############################################################################
 
-  raise NotImplementedError('calculate_cost_volume not implemented')
+  H = left_img.shape[0]
+  W = left_img.shape[1]
+  b = block_size
+  
+  cost_volume = torch.zeros(H, W, max_disparity)
+  # NOTE: I DONT H,W IN COST VOLUME ARE JUST 0s for NOW!@!!!!!!!
+  
+  disparity_map = torch.zeros((H -  2*(block_size//2), W - 2*(block_size//2)))
+  for i in range(block_size //2, H-block_size//2):
+    for j in range(block_size //2, W-block_size//2):
+        disps = []     
+        for s in range(50):
+            left_bound = j - b//2 - s
+            patch1 = left_img[i-b//2:i+b//2 + 1, j-b//2:j+b//2 + 1]
+            if (left_bound < block_size //2):
+                patch2 = right_img[i-b//2:i+b//2 + 1, j-b//2:j+b//2 + 1]
+                disps.append(sim_measure_function(patch1, patch2))
+                break
+            else:
+                patch2 = right_img[i-b//2:i+b//2 + 1, j- b//2 - s:j + b//2 - s + 1]
+                disps.append(sim_measure_function(patch1, patch2))
+        #disps.append(sim_measure_function(patch1, patch2))
+        disps = disps[:max_disparity]
+        while len(disps) < max_disparity:
+            disps.append(255)
+        disps = np.array(disps)
+        disps = torch.tensor(disps)
+        print(disps)
+        cost_volume[i,j] = disps
+        
+        
 
   ############################################################################
   # Student code end
