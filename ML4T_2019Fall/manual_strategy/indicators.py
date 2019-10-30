@@ -24,8 +24,11 @@ def bollinger_bands(df_prices, ticker, results_df):
     results_df["upper_b"] = higher_b
     results_df["lower_b"] = lower_b
     #bb_value???
-def atr(df_prices, ticker, results_df):
-    
+def momentum(df_prices, ticker, results_df):
+    adj_closes = df_prices[ticker]
+    adj_closes = adj_closes/adj_closes[0]
+    m = adj_closes.rolling(10).std()
+    results_df["momentum"] = m
 
 def main():
     start = dt.datetime(2010,1,1)
@@ -36,6 +39,7 @@ def main():
     
     rolling_avg(df_prices, "JPM", df_ind)
     bollinger_bands(df_prices, "JPM", df_ind)
+    momentum(df_prices, "JPM", df_ind )
 
 
     #df_ind.plot()
