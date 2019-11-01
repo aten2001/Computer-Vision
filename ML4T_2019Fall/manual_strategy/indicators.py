@@ -39,8 +39,8 @@ def min_index(x):
 def aroon(df_prices, ticker, results_df):
     adj_closes = df_prices[ticker]
     adj_closes = adj_closes/adj_closes[0]
-    df_prices["aroon_up"] = adj_closes.rolling(25).apply(max_index)
-    df_prices["aroon_down"] = adj_closes.rolling(25).apply(min_index)
+    df_prices["aroon_up"] = adj_closes.rolling(25).apply(max_index, raw=True)
+    df_prices["aroon_down"] = adj_closes.rolling(25).apply(min_index, raw=True)
 
 
 def prepare_pricedf(startDate, endDate):
