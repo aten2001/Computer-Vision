@@ -75,7 +75,9 @@ def plot_ideal_trades(df_prices):
     total_df = pd.DataFrame(index=portvals.index)
     total_df["Theoretical Returns"] = portvals["Theoretical Returns"]
     total_df["Benchmark Returns"] = bench_portvals["Benchmark Returns"]
-    
+    total_df["Theoretical Returns"] = total_df["Theoretical Returns"] / total_df["Theoretical Returns"][0]
+    total_df["Benchmark Returns"] = total_df["Benchmark Returns"] / total_df["Benchmark Returns"][0]
+
     curr_plt = plt.figure(0)
     plt.title("Returns of Theoretically Optimal Strategy vs Benchmark")
     plt.plot(total_df["Theoretical Returns"], label = "Theoretical Returns")
@@ -100,11 +102,10 @@ def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,
     end = ed
     dates = pd.date_range(start,end)
     df_prices = util.get_data([symbol], dates, False)
-    prices = df_prices[symbol]/df_prices[symbol][0]
 
     trades_df = look_ahead(df_prices)
     benchmark_df = create_benchmark_tradesDF(df_prices)
-    print(benchmark_df)
+
 
     #Plot Ideal Trades & Benchmark
     sv=100000
