@@ -92,9 +92,10 @@ def compute_portvals(orders_df, start_val = 1000000, commission=9.95, impact=0.0
     port = (data * port).sum(axis = 1)
     portvals = pd.DataFrame(port, index= port.index, columns = ["portfolio_totals"])
     rv = pd.DataFrame(index=portvals.index, data=portvals.values)
-	  			  	 		  		  		    	 		 		   		 		    		   	  			  	 		  		  		    	 		 		   		 		  
+
+    return portvals 			  	 		  		  		    	 		 		   		 		    		   	  			  	 		  		  		    	 		 		   		 		  
     return rv 		   	  			  	 		  		  		    	 		 		   		 		  
-    return portvals  		   	  			  	 		  		  		    	 		 		   		 		  
+     		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 def test_code(orders_df):  		   	  			  	 		  		  		    	 		 		   		 		  
     # this is a helper function you can use to test your code  		   	  			  	 		  		  		    	 		 		   		 		  

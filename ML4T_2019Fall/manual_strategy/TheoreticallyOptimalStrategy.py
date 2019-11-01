@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 from marketsimcode import *
 import matplotlib.pyplot as plt
 
-
-
 def look_ahead(df_prices, symbol="JPM"):
     share_orders = []
     dates = []
@@ -66,12 +64,38 @@ def look_ahead(df_prices, symbol="JPM"):
     
 def plot_ideal_trades(df_prices):
     trades_df = look_ahead(df_prices)
-    portvals = compute_portvals(trades_df, start_val = 1000000, commission=0, impact=0)
-    portvals.plot(title="Returns of Theoretically Optimal Strategy (Looking into the Future)", label="Theoretical Returns")
-    plt.legend(loc="lower left")
-    plt.show()
+    portvals = compute_portvals(trades_df, start_val = 100000, commission=0, impact=0)
+    portvals["Theoretical Returns"] = portvals["portfolio_totals"]
+    portvals = portvals.drop("portfolio_totals", axis =1)
+
+    bench_df = create_benchmark_tradesDF(df_prices)
+    bench_portvals = compute_portvals(bench_df, start_val = 100000, commission=0, impact=0)
+    bench_portvals["Benchmark Returns"] = bench_portvals["portfolio_totals"]
+
+    total_df = pd.DataFrame(index=portvals.index)
+    total_df["Theoretical Returns"] = portvals["Theoretical Returns"]
+    total_df["Benchmark Returns"] = bench_portvals["Benchmark Returns"]
     
-def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31), sv=100000):
+    curr_plt = plt.figure(0)
+    plt.title("Returns of Theoretically Optimal Strategy vs Benchmark")
+    plt.plot(total_df["Theoretical Returns"], label = "Theoretical Returns")
+    plt.plot(total_df["Benchmark Returns"], label = "Benchmark Returns")
+    plt.legend(loc="upper left")
+
+    plt.show()
+
+def create_benchmark_tradesDF(df_prices, symbol="JPM"):
+    dates = []
+    dates.append(df_prices.index[3])
+    dates.append(df_prices.index[len(df_prices.index)-2])
+    symbols = [symbol,symbol]
+    df_trades = pd.DataFrame(data = symbols, index = dates, columns = ['Symbol'])
+    df_trades["Order"] = ["BUY", "SELL"]
+    df_trades["Shares"] = [1000, 1000]
+    df_trades.index.name = "Date"
+    return df_trades
+    
+def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31), sv=10000):
     start = sd
     end = ed
     dates = pd.date_range(start,end)
@@ -79,17 +103,19 @@ def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,
     prices = df_prices[symbol]/df_prices[symbol][0]
 
     trades_df = look_ahead(df_prices)
-    
+    benchmark_df = create_benchmark_tradesDF(df_prices)
+    print(benchmark_df)
+
+    #Plot Ideal Trades & Benchmark
     sv=100000
     portvals = compute_portvals(trades_df, start_val = 1000000, commission=0, impact=0)
-    print(portvals)		   	  			  	 		  		  		    	 		 		   		 		  
-    if isinstance(portvals, pd.DataFrame):  		   	  			  	 		  		  		    	 		 		   		 		  
-        portvals = portvals[portvals.columns[0]]
-
-    #Plot Trades
+    portvals = portvals["portfolio_totals"]	  			  	 		  		  		    	 		 		   		 		  
+    #if isinstance(portvals, pd.DataFrame):  		   	  			  	 		  		  		    	 		 		   		 		  
+    #    portvals = portvals[portvals.columns[0]]
     plot_ideal_trades(df_prices)
 
-
+    
+    #Print out Metrics
     start_date = start 		   	  			  	 		  		  		    	 		 		   		 		  
     end_date = end
 
