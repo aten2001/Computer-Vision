@@ -113,7 +113,7 @@ def main():
     plot_momentum(df_p)
     
 
-    print(df_p)
+    #print(df_p)
 
 
 
