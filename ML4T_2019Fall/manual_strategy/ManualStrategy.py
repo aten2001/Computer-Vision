@@ -23,10 +23,10 @@ def check_long_conditions(date, sd, ed):
     momentum = df_ind["momentum"]
     aroon_up = df_ind["aroon_up"]
 
-    if (sma[date] > 1.1 # 1
-    and bb_p[date] > 1 #0.5
-    and momentum[date] > 0.1 #0.02
-    and aroon_up[date] > 80 #50
+    if (sma[date] > 1.1 # 1.1
+    and bb_p[date] > 1 #1 1
+    and momentum[date] > 0.1 #0.1
+    and aroon_up[date] > 80 #80 60
         ):
     #if (sma[date] > 1 and momentum[date] > 1):
         """results = []
@@ -45,10 +45,10 @@ def check_short_conditions(date, sd, ed):
     momentum = df_ind["momentum"]
     aroon_down = df_ind["aroon_up"]
 
-    if (sma[date] < 0.9 # 1
-        and bb_p[date] < -0.08 # -0.5
-        and momentum[date] < -0.05 #0
-        and aroon_down[date] > 70): #50
+    if (sma[date] < 0.9 # 0.9 0.95-Dev values Man Strat
+        and bb_p[date] < -0.08 # -0.08 -0.08
+        and momentum[date] < -0.05 #-0.05 -0.00
+        and aroon_down[date] > 70): #70 50
     #if (sma[date] < 1):
         return True
     else:
@@ -113,6 +113,16 @@ def get_manualTrades_df(df_prices, sd, ed, symbol="JPM", ):
     df_trades["Order"] = buy_sell
     df_trades["Shares"] = abs_orders
     df_trades.index.name = "Date"
+
+    if len(df_trades.index) == 0:
+        dates = []
+        dates.append(df_prices.index[3])
+        dates.append(df_prices.index[len(df_prices.index)-2])
+        symbols = [symbol,symbol]
+        df_trades = pd.DataFrame(data = symbols, index = dates, columns = ['Symbol'])
+        df_trades["Order"] = ["SELL", "BUY"]
+        df_trades["Shares"] = [1000, 1000]
+        df_trades.index.name = "Date"
     
     return df_trades
 
@@ -151,7 +161,7 @@ def plot_man_trades(portvals, bench_portvals):
 # in sample/development period is January 1, 2008 to December 31 2009.
 # out of sample/testing period is January 1, 2010 to December 31 2011
 
-def testPolicy(symbol = "JPM", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12,31), sv=10000):
+def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31), sv=10000):
     df_prices = prepare_pricedf(sd, ed)
 
     trades_df = get_manualTrades_df(df_prices, sd , ed)
@@ -203,3 +213,11 @@ if __name__ == "__main__":
     trades_df = get_manualTrades_df(df_prices)
     print(trades_df)"""
     testPolicy()
+
+# TODO:
+# Save all plots instead of plt.show
+# green / red on Theoret optimal strat'
+# change date for TheoretOptimal Strat
+# Class for Man strat?
+# def author() in all files!
+# PRINT PORTFOLIO STATS FOR EACH RUN OF MAN and THEORET
