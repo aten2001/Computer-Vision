@@ -8,7 +8,7 @@ from indicators import*
 import matplotlib.pyplot as plt
 
 
-def build_ind_df(sd= dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31)):
+def build_ind_df(sd, ed):
     df_p = prepare_pricedf(sd, ed)
     rolling_avg(df_p, "JPM", df_p)
     bollinger_bands(df_p, "JPM", df_p)
@@ -16,16 +16,16 @@ def build_ind_df(sd= dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31)):
     aroon(df_p, "JPM", df_p)
     return df_p
 
-def check_long_conditions(date):
-    df_ind = build_ind_df()
+def check_long_conditions(date, sd, ed):
+    df_ind = build_ind_df(sd, ed)
     sma = df_ind["price/sma"]
     bb_p = df_ind["bb_num"]
     momentum = df_ind["momentum"]
     aroon_up = df_ind["aroon_up"]
 
-    if (sma[date] > 1 # 1
-    and bb_p[date] > 0.5 #0.5
-    and momentum[date] > 0.02 #0.02
+    if (sma[date] > 1.1 # 1
+    and bb_p[date] > 1 #0.5
+    and momentum[date] > 0.1 #0.02
     and aroon_up[date] > 80 #50
         ):
     #if (sma[date] > 1 and momentum[date] > 1):
@@ -38,23 +38,23 @@ def check_long_conditions(date):
     else:
         return False
 
-def check_short_conditions(date):
-    df_ind = build_ind_df()
+def check_short_conditions(date, sd, ed):
+    df_ind = build_ind_df(sd, ed)
     sma = df_ind["price/sma"]
     bb_p = df_ind["bb_num"]
     momentum = df_ind["momentum"]
     aroon_down = df_ind["aroon_up"]
 
-    if (sma[date] < 1 # 1
-        and bb_p[date] < -0.4 # -0.5
-        and momentum[date] < 0 #0
-        and aroon_down[date] > 60): #50
+    if (sma[date] < 0.9 # 1
+        and bb_p[date] < -0.08 # -0.5
+        and momentum[date] < -0.05 #0
+        and aroon_down[date] > 70): #50
     #if (sma[date] < 1):
         return True
     else:
         return False    
         
-def get_manualTrades_df(df_prices, symbol="JPM"):
+def get_manualTrades_df(df_prices, sd, ed, symbol="JPM", ):
     """for date in range(len(df_prices)):
         if check_long_conditions(date):
             print(True)
@@ -70,7 +70,7 @@ def get_manualTrades_df(df_prices, symbol="JPM"):
     dates = []
     count = []
     for date in range(len(df_prices)):
-        if (check_long_conditions(date)):
+        if (check_long_conditions(date, sd, ed)):
             if curr_shares == 0:
                 dates.append(df_prices.index[date])
                 share_orders.append(1000)
@@ -81,7 +81,7 @@ def get_manualTrades_df(df_prices, symbol="JPM"):
                 share_orders.append(2000)
                 curr_shares = curr_shares + 2000
                 count.append(curr_shares)
-        elif(check_short_conditions(date)):
+        elif(check_short_conditions(date, sd, ed)):
             if curr_shares == 0:
                 dates.append(df_prices.index[date])
                 share_orders.append(-1000)
@@ -148,11 +148,13 @@ def plot_man_trades(portvals, bench_portvals):
 
     plt.show()
 
+# in sample/development period is January 1, 2008 to December 31 2009.
+# out of sample/testing period is January 1, 2010 to December 31 2011
 
-def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31), sv=10000):
+def testPolicy(symbol = "JPM", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12,31), sv=10000):
     df_prices = prepare_pricedf(sd, ed)
 
-    trades_df = get_manualTrades_df(df_prices)
+    trades_df = get_manualTrades_df(df_prices, sd , ed)
     bench_df = create_benchmark_tradesDF(df_prices)
     bench_portvals = compute_portvals(bench_df, start_val = 100000, commission=9.95, impact=0.005)
 

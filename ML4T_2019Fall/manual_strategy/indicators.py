@@ -96,8 +96,10 @@ def plot_aroon(df_p):
     plt.show()
 
 def main():
-    start = dt.datetime(2010,1,1)
-    end = dt.datetime(2011,12,31)
+    #start = dt.datetime(2010,1,1)
+    #end = dt.datetime(2011,12,31)
+    start = dt.datetime(2008,1,1)
+    end = dt.datetime(2009,12,31)
     df_p = prepare_pricedf(start, end)
     
     
