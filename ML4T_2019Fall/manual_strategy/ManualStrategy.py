@@ -23,10 +23,10 @@ def check_long_conditions(date):
     momentum = df_ind["momentum"]
     aroon_up = df_ind["aroon_up"]
 
-    if (sma[date] > 1 
-    and bb_p[date] > 1 
-    and momentum[date] > 0 
-    and aroon_up[date] == 100
+    if (sma[date] > 1 # 1
+    and bb_p[date] > 0.5 #0.5
+    and momentum[date] > 0.02 #0.02
+    and aroon_up[date] > 80 #50
         ):
     #if (sma[date] > 1 and momentum[date] > 1):
         """results = []
@@ -45,10 +45,10 @@ def check_short_conditions(date):
     momentum = df_ind["momentum"]
     aroon_down = df_ind["aroon_up"]
 
-    if (sma[date] < 1 
-        and bb_p[date] < 1
-        and momentum[date] < 0
-        and aroon_down[date] > 50):
+    if (sma[date] < 1 # 1
+        and bb_p[date] < -0.4 # -0.5
+        and momentum[date] < 0 #0
+        and aroon_down[date] > 60): #50
     #if (sma[date] < 1):
         return True
     else:
@@ -128,14 +128,10 @@ def create_benchmark_tradesDF(df_prices, symbol="JPM"):
     df_trades.index.name = "Date"
     return df_trades
 
-def plot_man_trades(df_prices):
-    trades_df = get_manualTrades_df(df_prices)
-    portvals = compute_portvals(trades_df, start_val = 100000, commission=0, impact=0)
+def plot_man_trades(portvals, bench_portvals):
     portvals["Manual Strat Returns"] = portvals["portfolio_totals"]
     portvals = portvals.drop("portfolio_totals", axis =1)
 
-    bench_df = create_benchmark_tradesDF(df_prices)
-    bench_portvals = compute_portvals(bench_df, start_val = 100000, commission=0, impact=0)
     bench_portvals["Benchmark Returns"] = bench_portvals["portfolio_totals"]
 
     total_df = pd.DataFrame(index=portvals.index)
@@ -146,29 +142,29 @@ def plot_man_trades(df_prices):
 
     curr_plt = plt.figure(0)
     plt.title("Returns of Manual Strategy vs Benchmark")
-    plt.plot(total_df["Manual Strat Returns"], label = "Manual Strat Returns")
-    plt.plot(total_df["Benchmark Returns"], label = "Benchmark Returns")
+    plt.plot(total_df["Manual Strat Returns"], color="red", label = "Manual Strat Returns")
+    plt.plot(total_df["Benchmark Returns"], color="green", label = "Benchmark Returns")
     plt.legend(loc="upper left")
 
     plt.show()
 
 
 def testPolicy(symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31), sv=10000):
-    sd = sd= dt.datetime(2010,1,1)
-    ed = dt.datetime(2011,12,31)
     df_prices = prepare_pricedf(sd, ed)
 
     trades_df = get_manualTrades_df(df_prices)
-    benchmark_df = create_benchmark_tradesDF(df_prices)
+    bench_df = create_benchmark_tradesDF(df_prices)
+    bench_portvals = compute_portvals(bench_df, start_val = 100000, commission=9.95, impact=0.005)
 
 
     #Plot Ideal Trades & Benchmark
     sv=100000
-    portvals = compute_portvals(trades_df, start_val = 1000000, commission=0, impact=0)
-    portvals = portvals["portfolio_totals"]	  			  	 		  		  		    	 		 		   		 		  
+    portvals = compute_portvals(trades_df, start_val = 100000, commission=9.95, impact=0.005)
+    	  			  	 		  		  		    	 		 		   		 		  
     #if isinstance(portvals, pd.DataFrame):  		   	  			  	 		  		  		    	 		 		   		 		  
     #    portvals = portvals[portvals.columns[0]]
-    plot_man_trades(df_prices)
+    plot_man_trades(portvals, bench_portvals)
+    portvals = portvals["portfolio_totals"]
 
     
     #Print out Metrics
