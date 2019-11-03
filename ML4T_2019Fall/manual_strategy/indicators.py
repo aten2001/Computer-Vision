@@ -3,6 +3,8 @@ import util
 import numpy as np 
 import datetime as dt
 import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 def author():
     return 'shollister7'
@@ -57,13 +59,15 @@ def plot_sma(df_p):
     plt.plot(df_p['JPM'], label = "JPM Normalized Price")
     plt.plot(df_p['sma'], label = "20 day sma")
     plt.legend(loc="lower left")
+
+    plt.savefig("sma_chart.png")
     
     value_plot = plt.figure(1)
     plt.title("JPM Adj Close / SMA Value Chart")
     plt.plot(df_p['price/sma'], label = "price/sma")
     plt.legend(loc="lower left")
 
-    plt.show()
+    plt.savefig("sma_value.png")
 
 def plot_bb(df_p):
     curr_plt = plt.figure(2)
@@ -73,19 +77,20 @@ def plot_bb(df_p):
     plt.plot(df_p['upper_b'], label = "Upper Band")
     plt.plot(df_p['lower_b'], label = "Lower Band")
     plt.legend(loc="lower left")
+    plt.savefig("bb_chart.png")
 
     value_plot = plt.figure(3)
     plt.title("JPM Bollinger Bands Percent Indicator")
     plt.plot(df_p['bb_num'], label = "BB %")
     plt.legend(loc="lower left")
-    plt.show()
+    plt.savefig("bb_value.png")
 
 def plot_momentum(df_p):
     curr_plt = plt.figure(4)
     plt.title("JPM Momentum")
     plt.plot(df_p['momentum'], label = "JPM Momentum Indicator")
     plt.legend(loc="lower left")
-    plt.show()
+    plt.savefig("momentum.png")
 
 def plot_aroon(df_p):
     curr_plt = plt.figure(5)
@@ -93,7 +98,7 @@ def plot_aroon(df_p):
     plt.plot(df_p['aroon_up'], label = "JPM Aroon up Indicator")
     plt.plot(df_p['aroon_down'], label = "JPM Aroon down Indicator")
     plt.legend(loc="lower left")
-    plt.show()
+    plt.savefig("aroon.png")
 
 def main():
     #start = dt.datetime(2010,1,1)

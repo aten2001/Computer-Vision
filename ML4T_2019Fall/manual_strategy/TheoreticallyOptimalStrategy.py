@@ -80,11 +80,11 @@ def plot_ideal_trades(df_prices):
 
     curr_plt = plt.figure(0)
     plt.title("Returns of Theoretically Optimal Strategy vs Benchmark")
-    plt.plot(total_df["Theoretical Returns"], label = "Theoretical Returns")
-    plt.plot(total_df["Benchmark Returns"], label = "Benchmark Returns")
+    plt.plot(total_df["Theoretical Returns"], color="red", label = "Theoretical Returns")
+    plt.plot(total_df["Benchmark Returns"], color="green", label = "Benchmark Returns")
     plt.legend(loc="upper left")
 
-    plt.show()
+    plt.savefig("theoreticalStratReturns.png")
 
 def create_benchmark_tradesDF(df_prices, symbol="JPM"):
     dates = []
