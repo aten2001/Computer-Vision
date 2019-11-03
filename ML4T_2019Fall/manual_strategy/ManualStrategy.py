@@ -213,7 +213,7 @@ if __name__ == "__main__":
     start_date = sd 		   	  			  	 		  		  		    	 		 		   		 		  
     end_date = ed
 
-    #JUST PLACEHOLDERS	   	  			  	 		  		  		    	 		 		   		 		  
+    #Port Metrics   	  			  	 		  		  		    	 		 		   		 		  
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = ms.compute_port_stats(portvals)			  	 		  		  		    	 		 		   		 		  
     cum_ret_bench, avg_daily_ret_bench, std_daily_ret_bench, sharpe_ratio_bench = ms.compute_port_stats(bench_portvals) 		   	  			  	 		  		  		    	 		 		   		 		  
 
@@ -237,8 +237,3 @@ if __name__ == "__main__":
     print(f"Final Portfolio Value Manual Strat: {man_returns[-1]}")
     print(f"Final Portfolio Value Benchmark: {bench_returns[-1]}")  
 
-# TODO:
-# Class for Man strat?
-# def author() in all files!
-# matplotlib warning
-# PRINT PORTFOLIO STATS FOR EACH RUN OF MAN and THEORET
