@@ -1,0 +1,10 @@
+*.zip
+subtest_bin
+proj4_code/mc_cnn_network_pretrain_ws11.pth
+proj4_code/mc_cnn_network_pretrain_ws15.pth
+proj4_code/mc_cnn_network_pretrain_ws5.pth
+proj4_code/mc_cnn_network_pretrain_ws9.pth
+proj4_code/wget-log
+proj4_code/__pycache__/custom_utils.cpython-36.pyc
+proj4_code/cuda_10.1.243_418.87.00_linux.run
+
