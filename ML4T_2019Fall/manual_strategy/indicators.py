@@ -50,7 +50,7 @@ def prepare_pricedf(startDate, endDate):
     df_prices = util.get_data(["JPM"], time_period,False)
     df_prices = df_prices.fillna(method='ffill')
     df_prices = df_prices.fillna(method='bfill')
-    df_prices = df_prices / df_prices.ix[0,]
+    df_prices = df_prices / df_prices.iloc[0,]
     return df_prices
 
 def plot_sma(df_p):

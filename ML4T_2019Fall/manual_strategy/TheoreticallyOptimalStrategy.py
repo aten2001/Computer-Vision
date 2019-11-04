@@ -83,7 +83,7 @@ class TheoreticallyOptimalStrategy(object):
         plt.plot(total_df["Benchmark Returns"], color="green", label = "Benchmark Returns")
         plt.legend(loc="upper left")
 
-        plt.savefig("theoreticalStratReturns.png")
+        plt.savefig("theoreticalStratReturns2.png")
 
     def create_benchmark_tradesDF(self, df_prices, symbol="JPM"):
         dates = []
@@ -112,7 +112,7 @@ class TheoreticallyOptimalStrategy(object):
     def author(self):
         return "shollister7"
         
-    def testPolicy(self, symbol = "JPM", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,12,31), sv=10000):
+    def testPolicy(self, symbol = "JPM", sd=dt.datetime(2010,1,1), ed=dt.datetime(2011,12,31), sv=10000):
         dates = pd.date_range(sd,ed)
         df_prices = util.get_data([symbol], dates, False)
         trades_df = self.look_ahead(df_prices)
@@ -120,8 +120,8 @@ class TheoreticallyOptimalStrategy(object):
 
 if __name__ == "__main__":
     ts = TheoreticallyOptimalStrategy()
-    sd=dt.datetime(2008,1,1)
-    ed=dt.datetime(2009,12,31)
+    sd=dt.datetime(2010,1,1)
+    ed=dt.datetime(2011,12,31)
     df_prices = prepare_pricedf(sd, ed)
     
     #Create Benchmark trades_df
