@@ -36,7 +36,7 @@ def get_sp400():
 
 def generate_csv(stocks):
     end = datetime.datetime.today()
-    start = datetime.date(end.year-4,1,1)
+    start = datetime.date(end.year-3,1,1)
     count = 0
     for stonk in stocks:
         if not os.path.exists('data/{}.csv'.format(stonk)):
