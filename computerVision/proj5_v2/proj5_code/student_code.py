@@ -137,7 +137,17 @@ def nearest_neighbor_classify(train_image_feats, train_labels,
     #############################################################################
     # TODO: YOUR CODE HERE                                                      #
     #############################################################################
+    D = pairwise_distances(train_image_feats, test_image_feats)
+    k_dists = {}
+    print(train_image_feats.shape)
+    for i in range(train_image_feats.shape[0]):
+        for j in range(test_image_feats.shape[0]):
+                #print("dist between train[{}] and test[{}]: {}".format(i, j, D[i,j]))
+                k_dists.update({(i,j) : D[i,j]})
+    print(k_dists)
+    # Have dist between the training and test images, now calc nearest neighbor and look up label
 
+    
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
