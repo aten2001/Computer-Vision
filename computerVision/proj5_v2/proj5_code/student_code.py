@@ -292,13 +292,26 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     # 2. Loop through image with correct bounds and stride, get_sift_features()
     # 3. Add all sift features to np.array called sift_feats
     # 4. Run K means on sift feats, the vocab words are the centroids
+    sift_feats = []
+    img_width = image_arrays[0].shape[0]
+    img_height = image_arrays[0].shape[1]
     for img in image_arrays:
         img_array = np.array(img, dtype='float32')
         img_tensor = torch.from_numpy(img_array)
         img_tensor = img_tensor.reshape((1, 1, img.shape[0], img.shape[1]))
-     
-            
+
+        x_s = np.arange(10, img_width - 10, stride)
+        y_s = np.arange(10, img_height - 10, stride)
+       
+        sift_features = get_siftnet_features(img_tensor, x_s, y_s)
+        for f in sift_features:
+            sift_feats.append(f)
     
+    feat_array = np.array(sift_feats, dtype='float32')
+    centroids = kmeans(feat_array, 10, max_iter = 100)
+
+    vocab = centroids
+    #vocab must be size vocab size, dim
     
     ###########################################################################
     #                             END OF YOUR CODE                            #
