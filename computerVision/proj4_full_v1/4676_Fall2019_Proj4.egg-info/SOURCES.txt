@@ -6,6 +6,7 @@ setup.py
 4676_Fall2019_Proj4.egg-info/requires.txt
 4676_Fall2019_Proj4.egg-info/top_level.txt
 proj4_code/__init__.py
+proj4_code/custom_utils.py
 proj4_code/disparity_map.py
 proj4_code/network.py
 proj4_code/similarity_measures.py

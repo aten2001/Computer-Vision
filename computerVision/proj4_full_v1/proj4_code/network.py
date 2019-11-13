@@ -43,7 +43,26 @@ class MCNET(torch.nn.Module):
             ############################################################################
             # Student code begin
             ############################################################################
-
+            nn.Conv2d(1, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d( num_feature_map, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d(num_feature_map, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d(num_feature_map, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d(num_feature_map, num_feature_map,kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            
+            Reshape((batch_size, ws*ws*2*num_feature_map)), 
+            
+            #conv_out = 2 * 112 * 11 * 11
+            nn.Linear(ws*ws*2*num_feature_map,num_hidden_unit),
+            nn.ReLU(),
+            nn.Linear(num_hidden_unit,num_hidden_unit),
+            nn.ReLU(),
+            nn.Linear(num_hidden_unit,1),
+            nn.Sigmoid(),
             ############################################################################
             # Student code end
             ############################################################################
@@ -83,12 +102,36 @@ class ExtendedNet(torch.nn.Module):
         self.batch_size = batch_size
         self.ws = ws
         self.strict = strict
+        num_hidden_unit = 384
+        num_feature_map = 112
+        kernel_size = 3
 
         self.net = nn.Sequential(
             ############################################################################
             # Student code begin
             ############################################################################
+            nn.Conv2d(1, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d( num_feature_map, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d(num_feature_map, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d(num_feature_map, num_feature_map, kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
+            nn.Conv2d(num_feature_map, num_feature_map,kernel_size=kernel_size, stride=1, padding=(kernel_size//2)),
+            nn.ReLU(),
             
+            Reshape((batch_size, ws*ws*2*num_feature_map)), 
+            
+            #conv_out = 2 * 112 * 11 * 11
+            nn.Linear(ws*ws*2*num_feature_map,num_hidden_unit),
+            nn.ReLU(),
+            nn.Linear(num_hidden_unit,num_hidden_unit),
+            nn.ReLU(),
+            nn.Linear(num_hidden_unit,num_hidden_unit),
+            nn.ReLU(),
+            nn.Linear(num_hidden_unit,1),
+            nn.Sigmoid(),
             ############################################################################
             # Student code end
             ############################################################################
