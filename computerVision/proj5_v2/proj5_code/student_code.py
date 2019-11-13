@@ -285,9 +285,21 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-
-    raise NotImplementedError('build_vocabulary function not implemented.')
-
+    
+    #10, and stop at len(image_width) - 10
+    #len(image_height) - 10
+    # 1. For each image in image array, convert to tensor. Reshape
+    # 2. Loop through image with correct bounds and stride, get_sift_features()
+    # 3. Add all sift features to np.array called sift_feats
+    # 4. Run K means on sift feats, the vocab words are the centroids
+    for img in image_arrays:
+        img_array = np.array(img, dtype='float32')
+        img_tensor = torch.from_numpy(img_array)
+        img_tensor = img_tensor.reshape((1, 1, img.shape[0], img.shape[1]))
+     
+            
+    
+    
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
