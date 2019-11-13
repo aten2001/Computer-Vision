@@ -137,17 +137,32 @@ def nearest_neighbor_classify(train_image_feats, train_labels,
     #############################################################################
     # TODO: YOUR CODE HERE                                                      #
     #############################################################################
-    D = pairwise_distances(train_image_feats, test_image_feats)
+    """D = pairwise_distances(train_image_feats, test_image_feats)
     k_dists = {}
-    print(train_image_feats.shape)
     for i in range(train_image_feats.shape[0]):
         for j in range(test_image_feats.shape[0]):
                 #print("dist between train[{}] and test[{}]: {}".format(i, j, D[i,j]))
                 k_dists.update({(i,j) : D[i,j]})
-    print(k_dists)
+    
+    for img in range(test_image_feats.shape[0]):
+        neighbors = []
+        for j in k_dists:
+                print(k_dists.keys())"""
+    from collections import Counter
+    D = pairwise_distances(train_image_feats, test_image_feats)
+    for j in range(test_image_feats.shape[0]):
+        distances = []
+        for i in range(train_image_feats.shape[0]):
+                dist = D[i,j]
+                distances.append((j, dist, train_labels[i]))
+        distances.sort(key=lambda x: x[1])
+        neighbors = [x[2] for x in distances[:k]]
+        nearest = max(set(neighbors), key = neighbors.count)
+        test_labels.append(nearest)
+            
     # Have dist between the training and test images, now calc nearest neighbor and look up label
 
-    
+
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -190,8 +205,25 @@ def kmeans(feature_vectors, k, max_iter = 100):
     #############################################################################
     # TODO: YOUR CODE HERE                                                      #
     #############################################################################
+    
+    feature_size = range(feature_vectors.shape[0])
+    rand_ind = np.random.choice(feature_size, size=k)
+    centroids = feature_vectors[rand_ind]
 
-    raise NotImplementedError('kmeans function not implemented.')
+    while(True):
+        num_unique = np.unique(centroids, axis = 0).shape[0]
+        if num_unique < k:
+            rand_ind = np.random.choice(feature_size, size = k)
+            centroids = feature_vectors[rand_ind]
+        else:
+            break
+
+    for i in range(max_iter):
+        labels = np.argmin(pairwise_distances(centroids, feature_vectors), axis=0)
+       
+        for c in range(k):
+           centroids[c] = np.mean(feature_vectors[labels == c], axis=0)
+        #centroids = [np.mean(feature_vectors[labels == c], axis=0) for c in range(k)]
 
     #############################################################################
     #                             END OF YOUR CODE                              #
