@@ -212,7 +212,6 @@ def kmeans(feature_vectors, k, max_iter = 100):
     feature_size = range(feature_vectors.shape[0])
     rand_ind = np.random.choice(feature_size, size=k)
     centroids = feature_vectors[rand_ind]
-    print(centroids)
     while(True):
         num_unique = np.unique(centroids, axis = 0).shape[0]
         if num_unique < k:
@@ -234,7 +233,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     return centroids
 
 
-def build_vocabulary(image_arrays, vocab_size, stride = 20):
+def build_vocabulary(image_arrays, vocab_size, stride = 100):
     """
     This function will sample SIFT descriptors from the training images,
     cluster them with kmeans, and then return the cluster centers.
