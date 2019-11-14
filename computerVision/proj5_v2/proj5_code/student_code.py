@@ -231,7 +231,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     return centroids
 
 
-def build_vocabulary(image_arrays, vocab_size, stride = 500):
+def build_vocabulary(image_arrays, vocab_size, stride = 20):
     """
     This function will sample SIFT descriptors from the training images,
     cluster them with kmeans, and then return the cluster centers.
@@ -293,27 +293,33 @@ def build_vocabulary(image_arrays, vocab_size, stride = 500):
     # 3. Add all sift features to np.array called sift_feats
     # 4. Run K means on sift feats, the vocab words are the centroids
     sift_feats = []
-    img_width = image_arrays[0].shape[0]
-    img_height = image_arrays[0].shape[1]
+    
     for img in image_arrays:
+        #img_width = img.shape[0]
+        #img_height = img.shape[1]
         img_array = np.array(img, dtype='float32')
+        img_width = img.shape[1]
+        img_height = img.shape[0]
         img_tensor = torch.from_numpy(img_array)
         img_tensor = img_tensor.reshape((1, 1, img.shape[0], img.shape[1]))
 
         x_s = np.arange(10, img_width - 10, stride)
         y_s = np.arange(10, img_height - 10, stride)
 
-        print(x_s)
-        print(y_s)
+        x, y = np.meshgrid(x_s, y_s)
+        x = x.flatten()
+        y = y.flatten()
 
-       
-        sift_features = get_siftnet_features(img_tensor, x_s, y_s)
+        sift_features = get_siftnet_features(img_tensor, x, y)
+
         #sift_feats = [f for f in sift_features]
         for f in sift_features:
             sift_feats.append(f)
     
+    
     feat_array = np.array(sift_feats, dtype='float32')
-    centroids = kmeans(feat_array, 10, max_iter = 100)
+    print(feat_array.shape)
+    centroids = kmeans(feat_array, len(image_arrays), max_iter = 100)
     
     if len(centroids) > vocab_size:
         vocab = centroids[:vocab_size]
