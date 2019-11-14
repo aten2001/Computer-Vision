@@ -209,7 +209,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     feature_size = range(feature_vectors.shape[0])
     rand_ind = np.random.choice(feature_size, size=k)
     centroids = feature_vectors[rand_ind]
-
+    print(centroids)
     while(True):
         num_unique = np.unique(centroids, axis = 0).shape[0]
         if num_unique < k:
@@ -231,7 +231,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     return centroids
 
 
-def build_vocabulary(image_arrays, vocab_size, stride = 20):
+def build_vocabulary(image_arrays, vocab_size, stride = 100):
     """
     This function will sample SIFT descriptors from the training images,
     cluster them with kmeans, and then return the cluster centers.
@@ -294,6 +294,7 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     # 4. Run K means on sift feats, the vocab words are the centroids
     sift_feats = []
     
+    x_length = 0
     for img in image_arrays:
         #img_width = img.shape[0]
         #img_height = img.shape[1]
@@ -309,16 +310,20 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
         x, y = np.meshgrid(x_s, y_s)
         x = x.flatten()
         y = y.flatten()
+        x_length = x.shape[0]
+        sift_feats.append(np.array( get_siftnet_features(img_tensor, x, y)))
 
-        sift_features = get_siftnet_features(img_tensor, x, y)
+        #for f in sift_features:
+        #   sift_feats.append(f)
+    
 
-        #sift_feats = [f for f in sift_features]
-        for f in sift_features:
-            sift_feats.append(f)
+    feat_array = np.array(sift_feats)
+    if (feat_array.ndim > 2):
+        N = feat_array.shape[0]*feat_array.shape[1]
+        feat_array = feat_array.reshape((N, dim))
+    #N = x_length * len(image_arrays)
+    #feat_array = feat_array.reshape((N, dim))
     
-    
-    feat_array = np.array(sift_feats, dtype='float32')
-    print(feat_array.shape)
     centroids = kmeans(feat_array, len(image_arrays), max_iter = 100)
     
     if len(centroids) > vocab_size:
@@ -360,9 +365,6 @@ def kmeans_quantize(raw_data_pts, centroids):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-    
-    print(raw_data_pts.shape)
-    print(centroids.shape)
     D = pairwise_distances(raw_data_pts, centroids)
     indices = []
     for i in range(raw_data_pts.shape[0]):
