@@ -50,7 +50,8 @@ def test_pairwise_distances():
                     [1, 0, 0]])
 
     test_distances_1 = student_code.pairwise_distances(X_1, Y_1)
-
+    print(test_distances_1)
+    print(actual_distances_1)
     print("actual distances {}".format(actual_distances))
     print("test distances {}".format(test_distances))
 

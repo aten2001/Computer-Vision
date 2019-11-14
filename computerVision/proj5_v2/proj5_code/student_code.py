@@ -40,12 +40,15 @@ def pairwise_distances(X, Y):
     ###########################################################################
     
     D = np.zeros((X.shape[0], Y.shape[0]))
-    for i in range(X.shape[0]):
+    """for i in range(X.shape[0]):
         for j in range(Y.shape[0]):
                 #print(j)
-                D[i,j] = np.linalg.norm(X[i] - Y[j])
+                D[i,j] = np.linalg.norm(X[i] - Y[j])"""
+    j = np.arange(Y.shape[0])
+    for i in range(X.shape[0]):
+        D[i] = np.linalg.norm(X[i] - Y, axis = 1)
 
-
+    #print(np.linalg.norm((X - Y), axis = 1))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -231,7 +234,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     return centroids
 
 
-def build_vocabulary(image_arrays, vocab_size, stride = 100):
+def build_vocabulary(image_arrays, vocab_size, stride = 20):
     """
     This function will sample SIFT descriptors from the training images,
     cluster them with kmeans, and then return the cluster centers.
@@ -295,6 +298,7 @@ def build_vocabulary(image_arrays, vocab_size, stride = 100):
     sift_feats = []
     
     x_length = 0
+    idx = 0
     for img in image_arrays:
         #img_width = img.shape[0]
         #img_height = img.shape[1]
@@ -311,13 +315,19 @@ def build_vocabulary(image_arrays, vocab_size, stride = 100):
         x = x.flatten()
         y = y.flatten()
         x_length = x.shape[0]
-        sift_feats.append(np.array( get_siftnet_features(img_tensor, x, y)))
-
+        #sift_feats.append(np.array( get_siftnet_features(img_tensor, x, y)))
+        if idx == 0:
+            sift_feats= np.array( get_siftnet_features(img_tensor, x, y))
+        else:
+            new_feats = np.array( get_siftnet_features(img_tensor, x, y))
+            sift_feats = np.concatenate((sift_feats, new_feats))
+        idx = idx + 1
         #for f in sift_features:
         #   sift_feats.append(f)
     
 
     feat_array = np.array(sift_feats)
+    
     if (feat_array.ndim > 2):
         N = feat_array.shape[0]*feat_array.shape[1]
         feat_array = feat_array.reshape((N, dim))
