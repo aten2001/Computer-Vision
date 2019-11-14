@@ -231,7 +231,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     return centroids
 
 
-def build_vocabulary(image_arrays, vocab_size, stride = 20):
+def build_vocabulary(image_arrays, vocab_size, stride = 500):
     """
     This function will sample SIFT descriptors from the training images,
     cluster them with kmeans, and then return the cluster centers.
@@ -302,15 +302,24 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
 
         x_s = np.arange(10, img_width - 10, stride)
         y_s = np.arange(10, img_height - 10, stride)
+
+        print(x_s)
+        print(y_s)
+
        
         sift_features = get_siftnet_features(img_tensor, x_s, y_s)
+        #sift_feats = [f for f in sift_features]
         for f in sift_features:
             sift_feats.append(f)
     
     feat_array = np.array(sift_feats, dtype='float32')
     centroids = kmeans(feat_array, 10, max_iter = 100)
-
-    vocab = centroids
+    
+    if len(centroids) > vocab_size:
+        vocab = centroids[:vocab_size]
+    else:
+        vocab = centroids
+    #vocab = centroids
     #vocab must be size vocab size, dim
     
     ###########################################################################
@@ -345,8 +354,15 @@ def kmeans_quantize(raw_data_pts, centroids):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-
-    raise NotImplementedError('kmeans_quantize function not implemented.')
+    
+    print(raw_data_pts.shape)
+    print(centroids.shape)
+    D = pairwise_distances(raw_data_pts, centroids)
+    indices = []
+    for i in range(raw_data_pts.shape[0]):
+        indx = np.argmin(D[i,:])
+        indices.append(indx)
+    indices = np.array(indices)
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
