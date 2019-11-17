@@ -41,18 +41,17 @@ class QLearner(object):
         dyna = 0, \
         verbose = False):  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
-        self.verbose = verbose  		   	  			  	 		  		  		    	 		 		   		 		  
-        self.num_actions = num_actions  		   	  			  	 		  		  		    	 		 		   		 		  
-        self.s = 0  		   	  			  	 		  		  		    	 		 		   		 		  
-        self.a = 0  
-
         self.rar = rar
         self.radr = radr
         self.dyna = dyna
         self.num_states = num_states
+        self.num_actions = num_actions
         self.gamma = gamma
         self.alpha = alpha
         self.q = np.zeros((self.num_states, self.num_actions))
+        self.verbose = verbose  		   	  			  	 		  		  		    	 		 		   		 		  	   	  			  	 		  		  		    	 		 		   		 		  
+        self.s = 0  		   	  			  	 		  		  		    	 		 		   		 		  
+        self.a = 0  
         self.setup_table(self.dyna) 	  			  	 		  		  		    	 		 		   		 		  
 
     
@@ -62,10 +61,11 @@ class QLearner(object):
         @param s: The new state  		   	  			  	 		  		  		    	 		 		   		 		  
         @returns: The selected action  		   	  			  	 		  		  		    	 		 		   		 		  
         """  		   	  			  	 		  		  		    	 		 		   		 		  
-        self.s = s  		   	  			  	 		  		  		    	 		 		   		 		  
-        action = rand.randint(0, self.num_actions-1) 
+        curr_actions = self.num_actions - 1
+        self.s = s   	  			  	 		  		  		    	 		 		   		 		  
+        action = rand.randint(0, curr_actions) 
         if rand.random() > self.rar:
-            action = np.argmax(self.q[s,])
+            action = np.argmax(self.q[s,:])
         #self.rar = self.rar * self.radr
         #self.a = action	   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(f"s = {s}, a = {action}")  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -78,47 +78,16 @@ class QLearner(object):
         @param r: The ne state  		   	  			  	 		  		  		    	 		 		   		 		  
         @returns: The selected action  		   	  			  	 		  		  		    	 		 		   		 		  
         """ 
-        #self.setup_table(self.dyna)	   	  			  	 		  		  		    	 		 		   		 		  
-        #action = rand.randint(0, self.num_actions-1)  		   	  			  	 		  		  		    	 		 		   		 		  
-         		   	  			  	 		  		  		    	 		 		   		 		  
-        self.q[self.s, self.a] = (1 - self.alpha) * self.q[self.s, self.a] + self.alpha * (r + self.gamma * np.max(self.q[s_prime, :]))
-
-        if self.rar >= rand.random():
-            action = rand.randint(0, self.num_actions - 1)
-        else:
-            action = np.argmax(self.q[s_prime,:])
-        
+        #self.setup_table(self.dyna)
+        old_value = self.q[self.s, self.a]
+        l_rate = self.alpha
+        learned_value = r + self.gamma * np.max(self.q[s_prime, :])
+        #self.q[self.s, self.a] = (1-self.alpha) * old_value + l_rate * learned_value
+        self.update(old_value, l_rate, learned_value)
+        action = np.argmax(self.q[s_prime,:])
+        if self.rar >= rand.random(): action = rand.randint(0, self.num_actions - 1)
         self.rar = self.rar * self.radr
-
-        if self.dyna:
-            # increment Tc, update T and R
-            self.Tc[self.s, self.a, s_prime] = self.Tc[self.s, self.a, s_prime] + 1
-            self.T = self.Tc / self.Tc.sum(axis=2, keepdims=True)
-            self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
-            #print(self.R)
-
-            # iterate through the dyna simulations
-            for i in range(0, self.dyna):
-                # select a random a and s
-                a_dyna = np.random.randint(low=0, high=self.num_actions)
-                s_dyna = np.random.randint(low=0, high=self.num_states)
-                # infer s' from T
-                s_prime_dyna = np.random.multinomial(1, self.T[s_dyna, a_dyna,]).argmax()
-                #print("S prime Dyna : {}".format(s_prime_dyna))
-                #s_prime_test = self.T[s_dyna, a_dyna]
-                #print("S_prime_test : {}".format(s_prime_test))
-                # compute R from s and a
-                r = self.R[s_dyna, a_dyna]
-                # update q
-                
-                #print("r {}".format(r))
-                #print("a_dyna {}".format(a_dyna))
-                #print("s_dyna {}".format(s_dyna))
-                #print("s_prime_dyna {}".format(s_prime_dyna))
-                self.q[s_dyna, a_dyna] = (1 - self.alpha) * self.q[s_dyna, a_dyna] + \
-                                         self.alpha * (r + self.gamma * np.max(self.q[s_prime_dyna,:]))
-                            
-
+        self.dyna_hallucinate(self.dyna, s_prime, r)
         self.s = s_prime
         self.a = action
 
@@ -134,7 +103,28 @@ class QLearner(object):
             self.Tc = np.full((self.num_states,self.num_actions,self.num_states),0.0001)
             self.T = self.Tc / self.Tc.sum(axis=2, keepdims=True)
             self.R = np.full(table_size,-1.0)
+    
+    def update(self, old_value, l_rate, learned_value):
+       self.q[self.s, self.a] = (1-self.alpha) * old_value + l_rate * learned_value
+    
+    def dyna_hallucinate(self, dyna, s_prime, r):
+        if self.dyna:
+            self.Tc[self.s, self.a, s_prime] = self.Tc[self.s, self.a, s_prime] + 1
+            self.T = self.Tc / self.Tc.sum(axis=2, keepdims=True)
+            self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
+
+            a_dyn = np.random.randint(0, self.num_actions, size=self.dyna)
+            s_dyn = np.random.randint(0, self.num_states, size=self.dyna)
             
+            #print(self.R)
+            for i in range(s_dyn.shape[0]):
+                s_prime_dyna = np.random.multinomial(1, self.T[s_dyn[i], a_dyn[i],]).argmax()
+                r = self.R[s_dyn[i], a_dyn[i]]
+                self.q[s_dyn[i], a_dyn[i]] = (1 - self.alpha) * self.q[s_dyn[i], a_dyn[i]] + \
+                                         self.alpha * (r + self.gamma * np.max(self.q[s_prime_dyna,:]))
+        else:
+            pass
+
     def author(self):
         return "shollister7"
 
