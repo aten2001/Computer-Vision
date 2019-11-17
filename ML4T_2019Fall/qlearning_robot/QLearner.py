@@ -52,12 +52,12 @@ class QLearner(object):
         self.num_states = num_states
         self.gamma = gamma
         self.alpha = alpha
-        self.Q = None	   	  			  	 		  		  		    	 		 		   		 		  
+        self.Q = np.zeros((self.num_states, self.num_actions))	   	  			  	 		  		  		    	 		 		   		 		  
 
     def setup_table(self, dyna):
-        self.Q = np.full((self.num_states, self.num_actions), -1.0)
+        self.q = np.random.uniform(-1, 1, size=(self.num_states, self.num_actions))
         
-        if dyna:
+        if dyna != 0:
             self.Tc = np.full((self.num_states,self.num_actions,self.num_states),0.00000001)
             self.T = np.full((self.num_states,self.num_actions,self.num_states),0.000000001)
             self.R = np.zeros((self.num_states,self.num_actions))
@@ -95,6 +95,25 @@ class QLearner(object):
             action = np.argmax(self.Q[s_prime])
         
         self.rar = self.rar * self.radr
+
+        if self.dyna != 0:
+            # increment Tc, update T and R
+            self.Tc[self.s, self.a, s_prime] = self.Tc[self.s, self.a, s_prime] + 1
+            self.T = self.Tc / self.Tc.sum(axis=2, keepdims=True)
+            self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
+
+            # iterate through the dyna simulations
+            for i in range(0, self.dyna):
+                # select a random a and s
+                a_dyna = np.random.randint(low=0, high=self.num_actions)
+                s_dyna = np.random.randint(low=0, high=self.num_states)
+                # infer s' from T
+                s_prime_dyna = np.random.multinomial(1, self.T[s_dyna, a_dyna,]).argmax()
+                # compute R from s and a
+                r = self.R[s_dyna, a_dyna]
+                # update Q
+                self.q[s_dyna, a_dyna] = (1 - self.alpha) * self.q[s_dyna, a_dyna] + \
+                                         self.alpha * (r + self.gamma * np.max(self.q[s_prime_dyna,]))
 
         self.s = s_prime
         self.a = action
