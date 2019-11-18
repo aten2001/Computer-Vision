@@ -90,13 +90,17 @@ def get_tiny_images(image_arrays):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-
-    N = np.zeros((len(image_arrays), 256))
+    n = 32
+    d = n * n
+    #N = np.zeros((len(image_arrays), 256))
+    N = np.zeros((len(image_arrays), d))
     for i in range(len(image_arrays)):
-        dim = (16,16)
+        #dim = (16,16)
+        dim = (n,n)
         img = image_arrays[i]
         resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-        N[i] = resized.reshape((256,))
+        #N[i] = resized.reshape((256,))
+        N[i] = resized.reshape((d,))
     feats = N
 
     ###########################################################################
@@ -214,7 +218,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     centroids = feature_vectors[rand_ind]
     while(True):
         num_unique = np.unique(centroids, axis = 0).shape[0]
-        #print("num_unique: {} k: {}".format(num_unique, k))
+        print("num_unique: {} k: {}".format(num_unique, k))
         if num_unique < k:
             rand_ind = np.random.choice(feature_size, size = k)
             centroids = feature_vectors[rand_ind]
@@ -222,7 +226,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
             break
 
     for i in range(max_iter):
-        #print("int the for loop")
+        print("{} the for loop".format(i))
         labels = np.argmin(pairwise_distances(centroids, feature_vectors), axis=0)
        
         for c in range(k):
@@ -333,7 +337,7 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     #feat_array = np.array(sift_feats)
     
     #if (sift_feats.ndim > 2):
-    #print(sift_feats.shape)
+    print(sift_feats.shape)
     #N = sift_feats.shape[0]*sift_feats.shape[1]
     #feat_array = sift_feats.reshape((N, dim))
     #N = x_length * len(image_arrays)
