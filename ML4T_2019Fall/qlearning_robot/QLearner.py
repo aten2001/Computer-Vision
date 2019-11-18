@@ -113,16 +113,26 @@ class QLearner(object):
     
     def dyna_hallucinate(self, dyna, s_prime, r):
         if self.dyna:
+            self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
+            self.t_count[self.s, self.a, s_prime] = self.t_count[self.s, self.a, s_prime] + 1
+            self.T = self.t_count / self.t_count.sum(axis=2, keepdims=True)
+
+            dyna_a = np.random.randint(0, self.num_actions, size=self.dyna)
+            dyn_s = np.random.randint(0, self.num_states, size=self.dyna)
             exp_tuple_len = len(self.saved_actions["mem"])
             random_tuple = np.random.randint(exp_tuple_len, size=self.dyna)
            
-            for i in range(0, self.dyna):
+            for i in range(dyn_s.shape[0]):
+                dyna_sp = self.saved_actions["mem"][random_tuple[i]][2]
+                r = self.saved_actions["mem"][random_tuple[i]][3]
                 s = self.saved_actions["mem"][random_tuple[i]][0]
                 a = self.saved_actions["mem"][random_tuple[i]][1]
-                s_prime = self.saved_actions["mem"][random_tuple[i]][2]
-                r = self.saved_actions["mem"][random_tuple[i]][3]
-            
-                self.q[s, a] = (1-self.alpha)*self.q[s,a]+self.alpha*(r+self.gamma*self.q[s_prime, np.argmax(self.q[s_prime])])
+                
+                
+                old_value = self.q[s, a]
+                l_rate = self.alpha
+                learned_value = r + self.gamma * np.max(self.q[dyna_sp, :])
+                self.q[s, a] = (1-self.alpha) * old_value + l_rate * learned_value
   
         else:
             pass
@@ -132,19 +142,3 @@ class QLearner(object):
 
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
     print("Remember Q from Star Trek? Well, this isn't him")  		   	  			  	 		  		  		    	 		 		   		 		  
-"""if self.dyna:
-            self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
-            self.t_count[self.s, self.a, s_prime] = self.t_count[self.s, self.a, s_prime] + 1
-            self.T = self.t_count / self.t_count.sum(axis=2, keepdims=True)
-           
-
-            dyna_a = np.random.randint(0, self.num_actions, size=self.dyna)
-            dyn_s = np.random.randint(0, self.num_states, size=self.dyna)
-            
-            #print(self.R)
-            for i in range(dyn_s.shape[0]):
-                common_s = np.random.multinomial(1, self.T[dyn_s[i], dyna_a[i],:])
-                dyna_sp = common_s.argmax()
-                old_value = self.q[dyn_s[i], dyna_a[i]]
-                learned_value = self.R[dyn_s[i], dyna_a[i]] + self.gamma * np.max(self.q[dyna_sp])
-                self.q[dyn_s[i], dyna_a[i]] = (1 - self.alpha) * old_value + self.alpha * learned_value"""
