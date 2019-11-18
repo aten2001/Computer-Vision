@@ -243,6 +243,9 @@ def test_kmeans_quantize_noisy_continuous():
     gt_labels[10:20, :] += 1
     gt_labels[20:30, :] += 2
 
+    #print("student labels: {}".format(labels))
+    #print("gt_labels: {}".format(gt_labels))
+
     assert np.equal(labels.all(), gt_labels.all())
 
 

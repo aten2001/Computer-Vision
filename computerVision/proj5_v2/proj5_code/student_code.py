@@ -214,7 +214,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     centroids = feature_vectors[rand_ind]
     while(True):
         num_unique = np.unique(centroids, axis = 0).shape[0]
-        print("num_unique: {} k: {}".format(num_unique, k))
+        #print("num_unique: {} k: {}".format(num_unique, k))
         if num_unique < k:
             rand_ind = np.random.choice(feature_size, size = k)
             centroids = feature_vectors[rand_ind]
@@ -222,7 +222,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
             break
 
     for i in range(max_iter):
-        print("int the for loop")
+        #print("int the for loop")
         labels = np.argmin(pairwise_distances(centroids, feature_vectors), axis=0)
        
         for c in range(k):
@@ -333,14 +333,14 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     #feat_array = np.array(sift_feats)
     
     #if (sift_feats.ndim > 2):
-    print(sift_feats.shape)
+    #print(sift_feats.shape)
     #N = sift_feats.shape[0]*sift_feats.shape[1]
     #feat_array = sift_feats.reshape((N, dim))
     #N = x_length * len(image_arrays)
     #feat_array = feat_array.reshape((N, dim))
     
     #centroids = kmeans(sift_feats, len(image_arrays), max_iter = 1)
-    centroids = kmeans(sift_feats, vocab_size, max_iter = 100)
+    centroids = kmeans(sift_feats, vocab_size, max_iter = 15)
     
     if len(centroids) > vocab_size:
         vocab = centroids[:vocab_size]
@@ -384,11 +384,16 @@ def kmeans_quantize(raw_data_pts, centroids):
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
     D = pairwise_distances(raw_data_pts, centroids)
-    indices = []
+    """indices = []
     for i in range(raw_data_pts.shape[0]):
         indx = np.argmin(D[i,:])
         indices.append(indx)
-    indices = np.array(indices)
+    indices = np.array(indices)"""
+    N= raw_data_pts.shape[0]
+    idx = np.arange(raw_data_pts.shape[0])
+    idx = idx.astype(int)
+    indices = np.argmin(D[idx,:], axis=1)
+    #print(indices)
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -447,10 +452,11 @@ def get_bags_of_sifts(image_arrays, vocabulary, step_size = 10):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-    sift_feats = []
+    import time
+    start = time.time()
+    img_feats = []
     idx = 0
     stride = step_size
-    stride = 100
     for img in image_arrays:
         #img_width = img.shape[0]
         #img_height = img.shape[1]
@@ -467,26 +473,28 @@ def get_bags_of_sifts(image_arrays, vocabulary, step_size = 10):
         x = x.flatten()
         y = y.flatten()
         x_length = x.shape[0]
+        #print(x_length)
         #sift_feats.append(np.array( get_siftnet_features(img_tensor, x, y)))
         if idx == 0:
             sift_feats= np.array( get_siftnet_features(img_tensor, x, y))
+            img_feats.append(sift_feats)
         else:
             new_feats = np.array( get_siftnet_features(img_tensor, x, y))
+            img_feats.append(new_feats)
             sift_feats = np.concatenate((sift_feats, new_feats))
         idx = idx + 1
 
-
+    
     centroids = vocabulary
     quantized = kmeans_quantize(sift_feats, centroids)
-    print(sift_feats.shape)
-    print(feats.shape)
-    print(centroids.shape)
-    print(quantized.shape)
+    
+    bins = np.arange(len(vocab) + 1)
+    for i in range(len(img_feats)):
+        hist = np.histogram(quantized[img_feats[i].shape[0]], bins)
+        feats[i] = hist[0]
 
-
-
-
-
+    end = time.time()
+    print("Took: {} sec".format(end - start))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
