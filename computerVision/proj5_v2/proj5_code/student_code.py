@@ -151,7 +151,7 @@ def nearest_neighbor_classify(train_image_feats, train_labels,
         neighbors = []
         for j in k_dists:
                 print(k_dists.keys())"""
-    from collections import Counter
+  
     D = pairwise_distances(train_image_feats, test_image_feats)
     for j in range(test_image_feats.shape[0]):
         distances = []
@@ -214,6 +214,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     centroids = feature_vectors[rand_ind]
     while(True):
         num_unique = np.unique(centroids, axis = 0).shape[0]
+        print("num_unique: {} k: {}".format(num_unique, k))
         if num_unique < k:
             rand_ind = np.random.choice(feature_size, size = k)
             centroids = feature_vectors[rand_ind]
@@ -221,6 +222,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
             break
 
     for i in range(max_iter):
+        print("int the for loop")
         labels = np.argmin(pairwise_distances(centroids, feature_vectors), axis=0)
        
         for c in range(k):
@@ -233,7 +235,7 @@ def kmeans(feature_vectors, k, max_iter = 100):
     return centroids
 
 
-def build_vocabulary(image_arrays, vocab_size, stride = 100):
+def build_vocabulary(image_arrays, vocab_size, stride = 20):
     """
     This function will sample SIFT descriptors from the training images,
     cluster them with kmeans, and then return the cluster centers.
@@ -280,7 +282,8 @@ def build_vocabulary(image_arrays, vocab_size, stride = 100):
             is the length of your SIFT descriptor. Each row is a cluster center
             / visual word.
     """
-
+    import time
+    start = time.time()
     dim = 128  # length of the SIFT descriptors that you are going to compute.
     vocab = None
 
@@ -306,7 +309,7 @@ def build_vocabulary(image_arrays, vocab_size, stride = 100):
         img_height = img.shape[0]
         img_tensor = torch.from_numpy(img_array)
         img_tensor = img_tensor.reshape((1, 1, img.shape[0], img.shape[1]))
-
+    
         x_s = np.arange(10, img_width - 10, stride)
         y_s = np.arange(10, img_height - 10, stride)
 
@@ -321,24 +324,30 @@ def build_vocabulary(image_arrays, vocab_size, stride = 100):
             new_feats = np.array( get_siftnet_features(img_tensor, x, y))
             sift_feats = np.concatenate((sift_feats, new_feats))
         idx = idx + 1
+
+        
         #for f in sift_features:
         #   sift_feats.append(f)
     
 
-    feat_array = np.array(sift_feats)
+    #feat_array = np.array(sift_feats)
     
-    if (feat_array.ndim > 2):
-        N = feat_array.shape[0]*feat_array.shape[1]
-        feat_array = feat_array.reshape((N, dim))
+    #if (sift_feats.ndim > 2):
+    print(sift_feats.shape)
+    #N = sift_feats.shape[0]*sift_feats.shape[1]
+    #feat_array = sift_feats.reshape((N, dim))
     #N = x_length * len(image_arrays)
     #feat_array = feat_array.reshape((N, dim))
     
-    centroids = kmeans(feat_array, len(image_arrays), max_iter = 100)
+    #centroids = kmeans(sift_feats, len(image_arrays), max_iter = 1)
+    centroids = kmeans(sift_feats, vocab_size, max_iter = 100)
     
     if len(centroids) > vocab_size:
         vocab = centroids[:vocab_size]
     else:
         vocab = centroids
+    end = time.time()
+    print("Took: {} sec".format(end - start))
     #vocab = centroids
     #vocab must be size vocab size, dim
     
@@ -438,8 +447,45 @@ def get_bags_of_sifts(image_arrays, vocabulary, step_size = 10):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
+    sift_feats = []
+    idx = 0
+    stride = step_size
+    stride = 100
+    for img in image_arrays:
+        #img_width = img.shape[0]
+        #img_height = img.shape[1]
+        img_array = np.array(img, dtype='float32')
+        img_width = img.shape[1]
+        img_height = img.shape[0]
+        img_tensor = torch.from_numpy(img_array)
+        img_tensor = img_tensor.reshape((1, 1, img.shape[0], img.shape[1]))
+    
+        x_s = np.arange(10, img_width - 10, stride)
+        y_s = np.arange(10, img_height - 10, stride)
 
-    raise NotImplementedError('get_bags_of_sifts function not implemented.')
+        x, y = np.meshgrid(x_s, y_s)
+        x = x.flatten()
+        y = y.flatten()
+        x_length = x.shape[0]
+        #sift_feats.append(np.array( get_siftnet_features(img_tensor, x, y)))
+        if idx == 0:
+            sift_feats= np.array( get_siftnet_features(img_tensor, x, y))
+        else:
+            new_feats = np.array( get_siftnet_features(img_tensor, x, y))
+            sift_feats = np.concatenate((sift_feats, new_feats))
+        idx = idx + 1
+
+
+    centroids = vocabulary
+    quantized = kmeans_quantize(sift_feats, centroids)
+    print(sift_feats.shape)
+    print(feats.shape)
+    print(centroids.shape)
+    print(quantized.shape)
+
+
+
+
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
