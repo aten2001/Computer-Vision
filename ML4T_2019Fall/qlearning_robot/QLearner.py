@@ -49,10 +49,12 @@ class QLearner(object):
         self.gamma = gamma
         self.alpha = alpha
         self.q = np.zeros((self.num_states, self.num_actions))
+        self.saved_actions = {"mem":[]}
         self.verbose = verbose  		   	  			  	 		  		  		    	 		 		   		 		  	   	  			  	 		  		  		    	 		 		   		 		  
         self.s = 0  		   	  			  	 		  		  		    	 		 		   		 		  
         self.a = 0  
-        self.setup_table(self.dyna) 	  			  	 		  		  		    	 		 		   		 		  
+        self.setup_table(self.dyna)
+    	  			  	 		  		  		    	 		 		   		 		  
 
     
     def querysetstate(self, s):  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -86,10 +88,12 @@ class QLearner(object):
         self.update(old_value, l_rate, learned_value)
         action = np.argmax(self.q[s_prime,:])
         if self.rar > rand.uniform(0.0, 1.0): action = rand.randint(0, self.num_actions - 1)
+        self.saved_actions["mem"].append((self.s, self.a, s_prime, r))
         self.rar = self.rar * self.radr
         self.dyna_hallucinate(self.dyna, s_prime, r)
         self.s = s_prime
         self.a = action
+        
 
         if self.verbose: print(f"s = {s_prime}, a = {action}, r={r}") 
         
@@ -109,6 +113,26 @@ class QLearner(object):
     
     def dyna_hallucinate(self, dyna, s_prime, r):
         if self.dyna:
+            exp_tuple_len = len(self.saved_actions["mem"])
+            random_tuple = np.random.randint(exp_tuple_len, size=self.dyna)
+           
+            for i in range(0, self.dyna):
+                s = self.saved_actions["mem"][random_tuple[i]][0]
+                a = self.saved_actions["mem"][random_tuple[i]][1]
+                s_prime = self.saved_actions["mem"][random_tuple[i]][2]
+                r = self.saved_actions["mem"][random_tuple[i]][3]
+            
+                self.q[s, a] = (1-self.alpha)*self.q[s,a]+self.alpha*(r+self.gamma*self.q[s_prime, np.argmax(self.q[s_prime])])
+  
+        else:
+            pass
+
+    def author(self):
+        return "shollister7"
+
+if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("Remember Q from Star Trek? Well, this isn't him")  		   	  			  	 		  		  		    	 		 		   		 		  
+"""if self.dyna:
             self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
             self.t_count[self.s, self.a, s_prime] = self.t_count[self.s, self.a, s_prime] + 1
             self.T = self.t_count / self.t_count.sum(axis=2, keepdims=True)
@@ -123,13 +147,4 @@ class QLearner(object):
                 dyna_sp = common_s.argmax()
                 old_value = self.q[dyn_s[i], dyna_a[i]]
                 learned_value = self.R[dyn_s[i], dyna_a[i]] + self.gamma * np.max(self.q[dyna_sp])
-                self.q[dyn_s[i], dyna_a[i]] = (1 - self.alpha) * old_value + self.alpha * learned_value
-           
-        else:
-            pass
-
-    def author(self):
-        return "shollister7"
-
-if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("Remember Q from Star Trek? Well, this isn't him")  		   	  			  	 		  		  		    	 		 		   		 		  
+                self.q[dyn_s[i], dyna_a[i]] = (1 - self.alpha) * old_value + self.alpha * learned_value"""
