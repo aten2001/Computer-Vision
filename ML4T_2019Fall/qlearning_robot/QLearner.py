@@ -65,7 +65,7 @@ class QLearner(object):
         self.s = s   	  			  	 		  		  		    	 		 		   		 		  
         action = rand.randint(0, curr_actions) 
         if rand.random() > self.rar:
-            action = np.argmax(self.q[s,:])
+            action = np.argmax(self.q[s])
         #self.rar = self.rar * self.radr
         #self.a = action	   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(f"s = {s}, a = {action}")  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -85,7 +85,7 @@ class QLearner(object):
         #self.q[self.s, self.a] = (1-self.alpha) * old_value + l_rate * learned_value
         self.update(old_value, l_rate, learned_value)
         action = np.argmax(self.q[s_prime,:])
-        if self.rar >= rand.random(): action = rand.randint(0, self.num_actions - 1)
+        if self.rar > rand.uniform(0.0, 1.0): action = rand.randint(0, self.num_actions - 1)
         self.rar = self.rar * self.radr
         self.dyna_hallucinate(self.dyna, s_prime, r)
         self.s = s_prime
@@ -100,8 +100,8 @@ class QLearner(object):
         self.q = np.random.uniform(-1, 1, table_size)
         
         if dyna:
-            self.Tc = np.full((self.num_states,self.num_actions,self.num_states),0.0001)
-            self.T = self.Tc / self.Tc.sum(axis=2, keepdims=True)
+            self.t_count = np.full((self.num_states,self.num_actions,self.num_states),0.00001)
+            self.T = self.t_count / self.t_count.sum(axis=2, keepdims=True)
             self.R = np.full(table_size,-1.0)
     
     def update(self, old_value, l_rate, learned_value):
@@ -109,19 +109,22 @@ class QLearner(object):
     
     def dyna_hallucinate(self, dyna, s_prime, r):
         if self.dyna:
-            self.Tc[self.s, self.a, s_prime] = self.Tc[self.s, self.a, s_prime] + 1
-            self.T = self.Tc / self.Tc.sum(axis=2, keepdims=True)
             self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] + (self.alpha * r)
+            self.t_count[self.s, self.a, s_prime] = self.t_count[self.s, self.a, s_prime] + 1
+            self.T = self.t_count / self.t_count.sum(axis=2, keepdims=True)
+           
 
-            a_dyn = np.random.randint(0, self.num_actions, size=self.dyna)
-            s_dyn = np.random.randint(0, self.num_states, size=self.dyna)
+            dyna_a = np.random.randint(0, self.num_actions, size=self.dyna)
+            dyn_s = np.random.randint(0, self.num_states, size=self.dyna)
             
             #print(self.R)
-            for i in range(s_dyn.shape[0]):
-                s_prime_dyna = np.random.multinomial(1, self.T[s_dyn[i], a_dyn[i],]).argmax()
-                r = self.R[s_dyn[i], a_dyn[i]]
-                self.q[s_dyn[i], a_dyn[i]] = (1 - self.alpha) * self.q[s_dyn[i], a_dyn[i]] + \
-                                         self.alpha * (r + self.gamma * np.max(self.q[s_prime_dyna,:]))
+            for i in range(dyn_s.shape[0]):
+                common_s = np.random.multinomial(1, self.T[dyn_s[i], dyna_a[i],:])
+                dyna_sp = common_s.argmax()
+                old_value = self.q[dyn_s[i], dyna_a[i]]
+                learned_value = self.R[dyn_s[i], dyna_a[i]] + self.gamma * np.max(self.q[dyna_sp])
+                self.q[dyn_s[i], dyna_a[i]] = (1 - self.alpha) * old_value + self.alpha * learned_value
+           
         else:
             pass
 
