@@ -90,7 +90,7 @@ def get_tiny_images(image_arrays):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-    n = 32
+    n = 16
     d = n * n
     #N = np.zeros((len(image_arrays), 256))
     N = np.zeros((len(image_arrays), d))
@@ -337,7 +337,7 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     #feat_array = np.array(sift_feats)
     
     #if (sift_feats.ndim > 2):
-    print(sift_feats.shape)
+    #print(sift_feats.shape)
     #N = sift_feats.shape[0]*sift_feats.shape[1]
     #feat_array = sift_feats.reshape((N, dim))
     #N = x_length * len(image_arrays)
@@ -351,7 +351,7 @@ def build_vocabulary(image_arrays, vocab_size, stride = 20):
     else:
         vocab = centroids
     end = time.time()
-    print("Took: {} sec".format(end - start))
+    #print("Took: {} sec".format(end - start))
     #vocab = centroids
     #vocab must be size vocab size, dim
     
@@ -479,26 +479,36 @@ def get_bags_of_sifts(image_arrays, vocabulary, step_size = 10):
         x_length = x.shape[0]
         #print(x_length)
         #sift_feats.append(np.array( get_siftnet_features(img_tensor, x, y)))
-        if idx == 0:
+        """if idx == 0:
             sift_feats= np.array( get_siftnet_features(img_tensor, x, y))
             img_feats.append(sift_feats)
         else:
             new_feats = np.array( get_siftnet_features(img_tensor, x, y))
             img_feats.append(new_feats)
             sift_feats = np.concatenate((sift_feats, new_feats))
+        idx = idx + 1"""
+        centroids = vocabulary
+        sift_feats = np.array(get_siftnet_features(img_tensor, x, y))
+        quantized = kmeans_quantize(sift_feats, centroids)
+        bins = np.arange(len(vocab) + 1)
+        hist = np.histogram(quantized, bins)[0]
+        normed_hist = np.linalg.norm(hist)
+        hist = np.divide(hist, normed_hist)
+        feats[idx] = hist
         idx = idx + 1
 
     
-    centroids = vocabulary
-    quantized = kmeans_quantize(sift_feats, centroids)
-    
-    bins = np.arange(len(vocab) + 1)
-    for i in range(len(img_feats)):
-        hist = np.histogram(quantized[img_feats[i].shape[0]], bins)
-        feats[i] = hist[0]
+        """centroids = vocabulary
+        quantized = kmeans_quantize(sift_feats, centroids)
+        
+        bins = np.arange(len(vocab) + 1)
+        for i in range(len(img_feats)):
+            hist = np.histogram(quantized[img_feats[i].shape[0]], bins)[0]
+            hist = hist / np.linalg.norm(hist)
+            feats[i] = hist"""
 
     end = time.time()
-    print("Took: {} sec".format(end - start))
+    #print("Took: {} sec".format(end - start))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
