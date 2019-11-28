@@ -90,7 +90,7 @@ def get_tiny_images(image_arrays):
     ###########################################################################
     # TODO: YOUR CODE HERE                                                    #
     ###########################################################################
-    n = 32
+    n = 16
     d = n * n
     #N = np.zeros((len(image_arrays), 256))
     N = np.zeros((len(image_arrays), d))
@@ -494,8 +494,9 @@ def get_bags_of_sifts(image_arrays, vocabulary, step_size = 10):
     
     bins = np.arange(len(vocab) + 1)
     for i in range(len(img_feats)):
-        hist = np.histogram(quantized[img_feats[i].shape[0]], bins)
-        feats[i] = hist[0]
+        hist = np.histogram(quantized[img_feats[i].shape[0]], bins)[0]
+        hist = hist / np.linalg.norm(hist)
+        feats[i] = hist
 
     end = time.time()
     print("Took: {} sec".format(end - start))
