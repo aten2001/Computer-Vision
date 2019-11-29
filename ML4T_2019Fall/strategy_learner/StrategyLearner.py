@@ -46,7 +46,7 @@ class StrategyLearner(object):
         self.q_l = ql.QLearner(num_states=1000, num_actions=3, alpha=0.2, gamma=0.9, rar=0.5, radr=0.99, dyna=0, verbose=False)		   	  			  	 		  		  		    	 		 		   		 		  
 
     def get_indicators(self, symbol="JPM", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1) ):
-        df_p = ind.prepare_pricedf(sd, ed)
+        df_p = ind.prepare_pricedf(symbol,sd, ed)
         ind.rolling_avg(df_p, symbol, df_p)
         ind.bollinger_bands(df_p, symbol, df_p)
         ind.momentum(df_p, symbol, df_p )
@@ -54,6 +54,18 @@ class StrategyLearner(object):
         df_p.fillna(method='ffill', inplace=True)
         df_p.fillna(method='backfill', inplace=True)
         return df_p
+
+    def discretize(self, indicators):
+        indicators["price/sma"] = pd.cut(indicators['price/sma'], 10, labels=False)
+        indicators["bb_num"] = pd.cut(indicators['bb_num'], 10, labels=False)
+        indicators["momentum"] = pd.cut(indicators['momentum'], 10, labels=False)
+        indicators["aroon_up"] = pd.cut(indicators['aroon_up'], 10, labels=False)
+        indicators["aroon_down"] = pd.cut(indicators['aroon_down'], 10, labels=False)
+        indicators = indicators.drop(['sma', 'upper_b', 'lower_b'], axis=1)
+        indicators['state'] = indicators["price/sma"] + indicators["bb_num"] + indicators["momentum"]  + indicators['aroon_up']  + indicators['aroon_down']
+        
+        #return (bb * 1000) + (self.pp * 100) + (norm[date] * 10) + psma[date]
+        return indicators
 
     # this method should create a QLearner, and train it for trading  		   	  			  	 		  		  		    	 		 		   		 		  
     def addEvidence(self, symbol = "JPM", \
@@ -76,6 +88,63 @@ class StrategyLearner(object):
         volume = volume_all[syms]  # only portfolio symbols  		   	  			  	 		  		  		    	 		 		   		 		  
         volume_SPY = volume_all['SPY']  # only SPY, for comparison later  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(volume)
+
+        df_p = self.get_indicators(symbol, sd, ed)
+        feats = self.discretize(df_p)
+        #print(ind_normed)
+        port_val = feats[symbol]
+        daily_returns = port_val.copy()
+        daily_returns[1:] = (port_val[1:] / port_val[:-1].values) - 1
+
+        init_state = feats.iloc[0]['state']
+        self.q_l.querysetstate(int(float(init_state)))
+
+        orders = pd.DataFrame(0, index = feats.index, columns = ['Shares'])
+        buy_sell = pd.DataFrame('BUY', index = feats.index, columns = ['Order'])
+        symbol_df = pd.DataFrame(symbol, index = feats.index, columns = ['Symbol'])
+
+        df_trades = pd.concat([symbol_df, buy_sell, orders], axis=1)
+        df_trades.columns = ['Symbol', 'Order', 'Shares']
+        df_trades.index.name = "Date"
+
+        df_trades_copy = df_trades.copy()
+        
+        i = 0
+
+        while i < 500:
+            i +=1
+            reward = 0
+            total_holdings = 0
+
+            if(i > 20) and (df_trades.equals(df_trades_copy)):
+                #print(i)
+                break
+
+            df_trades_copy = df_trades.copy()
+
+            for index, row in feats.iterrows():
+                reward = total_holdings * daily_returns.loc[index] * (1 - self.impact)
+                a = self.q_l.query(int(float(feats.loc[index]['state'])), reward)
+                if(a == 1) and (total_holdings < 1000):
+                    buy_sell.loc[index]['Order'] = 'BUY'
+                    if total_holdings == 0:
+                        orders.loc[index]['Shares'] = 1000
+                        total_holdings += 1000
+                    else:
+                        orders.loc[index]['Shares'] = 2000
+                        total_holdings += 2000
+                elif (a == 2) and (total_holdings > -1000):
+                    buy_sell.loc[index]['Order'] = 'SELL'
+                    if total_holdings == 0:
+                        orders.loc[index]['Shares'] = -1000
+                        total_holdings = total_holdings - 1000
+                    else:
+                        orders.loc[index]['Shares'] = -2000
+                        total_holdings = total_holdings - 2000
+
+            df_trades = pd.concat([symbol_df, buy_sell, orders], axis=1)
+            df_trades.columns = ['Symbol', 'Order', 'Shares']
+            #print(df_trades)
 
     def author(self):
         return 'shollister7'  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -103,8 +172,63 @@ class StrategyLearner(object):
         if self.verbose: print(trades)  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(prices_all)
 
-        df_p = self.get_indicators()
-        print(df_p)		   	  			  	 		  		  		    	 		 		   		 		  
+        df_p = self.get_indicators(symbol, sd, ed)
+        feats = self.discretize(df_p)
+        #print(ind_normed)
+        port_val = feats[symbol]
+        daily_returns = port_val.copy()
+        daily_returns[1:] = (port_val[1:] / port_val[:-1].values) - 1
+
+        init_state = feats.iloc[0]['state']
+        self.q_l.querysetstate(int(float(init_state)))
+
+        orders = pd.DataFrame(0, index = feats.index, columns = ['Shares'])
+        buy_sell = pd.DataFrame('BUY', index = feats.index, columns = ['Order'])
+        symbol_df = pd.DataFrame(symbol, index = feats.index, columns = ['Symbol'])
+
+        df_trades = pd.concat([symbol_df, buy_sell, orders], axis=1)
+        df_trades.columns = ['Symbol', 'Order', 'Shares']
+        df_trades.index.name = "Date"
+        
+
+        reward = 0
+        total_holdings = 0
+
+
+        initial_state = feats.iloc[0]['state']
+
+        self.q_l.querysetstate(int(float(initial_state)))
+
+        for index, row in feats.iterrows():
+            reward = total_holdings * daily_returns.loc[index]
+            #implement action
+            a = self.q_l.querysetstate(int(float(feats.loc[index]['state'])))
+            if(a == 1) and (total_holdings < 1000):
+                buy_sell.loc[index]['Order'] = 'BUY'
+                if total_holdings == 0:
+                    orders.loc[index]['Shares'] = 1000
+                    total_holdings += 1000
+                else:
+                    orders.loc[index]['Shares'] = 2000
+                    total_holdings += 2000
+            elif (a == 2) and (total_holdings > -1000):
+                buy_sell.loc[index]['Order'] = 'SELL'
+                if total_holdings == 0:
+                    orders.loc[index]['Shares'] = -1000
+                    total_holdings = total_holdings - 1000
+                else:
+                    orders.loc[index]['Shares'] = -2000
+                    total_holdings = total_holdings - 2000
+
+        df_trades = pd.concat([symbol_df, buy_sell, orders], axis=1)
+        df_trades.columns = ['Symbol', 'Order', 'Shares']
+
+        df_trades = df_trades.drop('Symbol', axis=1)
+        df_trades = df_trades.drop('Order', axis=1)
+
+        print(df_trades)
+        trades = df_trades
+        
         return trades  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  

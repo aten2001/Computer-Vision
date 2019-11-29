@@ -45,9 +45,9 @@ def aroon(df_prices, ticker, results_df):
     df_prices["aroon_down"] = adj_closes.rolling(25).apply(min_index, raw=True)
 
 
-def prepare_pricedf(startDate, endDate):
+def prepare_pricedf(symbol, startDate, endDate):
     time_period = pd.date_range(startDate, endDate)
-    df_prices = util.get_data(["JPM"], time_period,False)
+    df_prices = util.get_data([symbol], time_period,False)
     df_prices = df_prices.fillna(method='ffill')
     df_prices = df_prices.fillna(method='bfill')
     df_prices = df_prices / df_prices.iloc[0,]

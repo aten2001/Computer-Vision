@@ -1,3 +1,85 @@
 <pre>--- Summary ---
-Tests passed: 0 out of 0
+Tests passed: 0 out of 4
+
+--- Details ---
+Test #0: failed 
+Test case description: ML4T-220
+Traceback:
+  File "grade_strategy_learner.py", line 221, in test_strategy
+    student_insample_cr = evalPolicy2(insample_args['symbol'],in_trades_1,insample_args['sv'],insample_args['sd'],insample_args['ed'],market_impact=impact,commission_cost=0.0)
+  File "grade_strategy_learner.py", line 295, in evalPolicy2
+    portvals = compute_portvals(orders_df, sd, ed, startval,market_impact,commission_cost)
+  File "grade_strategy_learner.py", line 324, in compute_portvals
+    price = prices[symbol][date]
+  File "series.py", line 868, in __getitem__
+    result = self.index.get_value(self, key)
+  File "datetimes.py", line 939, in get_value
+    return self.get_value_maybe_box(series, key)
+  File "datetimes.py", line 971, in get_value_maybe_box
+    key, tz=self.tz)
+  File "index.pyx", line 81, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 89, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 441, in pandas._libs.index.DatetimeEngine.get_loc
+KeyError: Timestamp('2008-02-09 00:00:00')
+
+Test #1: failed 
+Test case description: AAPL
+Traceback:
+  File "grade_strategy_learner.py", line 221, in test_strategy
+    student_insample_cr = evalPolicy2(insample_args['symbol'],in_trades_1,insample_args['sv'],insample_args['sd'],insample_args['ed'],market_impact=impact,commission_cost=0.0)
+  File "grade_strategy_learner.py", line 295, in evalPolicy2
+    portvals = compute_portvals(orders_df, sd, ed, startval,market_impact,commission_cost)
+  File "grade_strategy_learner.py", line 324, in compute_portvals
+    price = prices[symbol][date]
+  File "series.py", line 868, in __getitem__
+    result = self.index.get_value(self, key)
+  File "datetimes.py", line 939, in get_value
+    return self.get_value_maybe_box(series, key)
+  File "datetimes.py", line 971, in get_value_maybe_box
+    key, tz=self.tz)
+  File "index.pyx", line 81, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 89, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 441, in pandas._libs.index.DatetimeEngine.get_loc
+KeyError: Timestamp('2008-01-01 00:00:00')
+
+Test #2: failed 
+Test case description: SINE_FAST_NOISE
+Traceback:
+  File "grade_strategy_learner.py", line 221, in test_strategy
+    student_insample_cr = evalPolicy2(insample_args['symbol'],in_trades_1,insample_args['sv'],insample_args['sd'],insample_args['ed'],market_impact=impact,commission_cost=0.0)
+  File "grade_strategy_learner.py", line 295, in evalPolicy2
+    portvals = compute_portvals(orders_df, sd, ed, startval,market_impact,commission_cost)
+  File "grade_strategy_learner.py", line 324, in compute_portvals
+    price = prices[symbol][date]
+  File "series.py", line 868, in __getitem__
+    result = self.index.get_value(self, key)
+  File "datetimes.py", line 939, in get_value
+    return self.get_value_maybe_box(series, key)
+  File "datetimes.py", line 971, in get_value_maybe_box
+    key, tz=self.tz)
+  File "index.pyx", line 81, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 89, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 441, in pandas._libs.index.DatetimeEngine.get_loc
+KeyError: Timestamp('2008-01-01 00:00:00')
+
+Test #3: failed 
+Test case description: UNH - In sample
+Traceback:
+  File "grade_strategy_learner.py", line 221, in test_strategy
+    student_insample_cr = evalPolicy2(insample_args['symbol'],in_trades_1,insample_args['sv'],insample_args['sd'],insample_args['ed'],market_impact=impact,commission_cost=0.0)
+  File "grade_strategy_learner.py", line 295, in evalPolicy2
+    portvals = compute_portvals(orders_df, sd, ed, startval,market_impact,commission_cost)
+  File "grade_strategy_learner.py", line 324, in compute_portvals
+    price = prices[symbol][date]
+  File "series.py", line 868, in __getitem__
+    result = self.index.get_value(self, key)
+  File "datetimes.py", line 939, in get_value
+    return self.get_value_maybe_box(series, key)
+  File "datetimes.py", line 971, in get_value_maybe_box
+    key, tz=self.tz)
+  File "index.pyx", line 81, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 89, in pandas._libs.index.IndexEngine.get_value
+  File "index.pyx", line 441, in pandas._libs.index.DatetimeEngine.get_loc
+KeyError: Timestamp('2008-01-01 00:00:00')
+
 </pre>

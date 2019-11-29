@@ -139,7 +139,8 @@ def test_strategy(description, insample_args, outsample_args, benchmark_type, be
             out_test_t = time.time()-tmp  		   	  			  	 		  		  		    	 		 		   		 		  
             return insample_trades_1, insample_trades_2, outsample_trades, train_t, test_t, out_test_t  		   	  			  	 		  		  		    	 		 		   		 		  
         msgs = []  		   	  			  	 		  		  		    	 		 		   		 		  
-        in_trades_1, in_trades_2, out_trades, train_t, test_t, out_test_t = run_with_timeout(timeoutwrapper_strategylearner,max_time,(),{})  		   	  			  	 		  		  		    	 		 		   		 		  
+        in_trades_1, in_trades_2, out_trades, train_t, test_t, out_test_t = run_with_timeout(timeoutwrapper_strategylearner,max_time,(),{})
+        #print(in_trades_1.shape) 		   	  			  	 		  		  		    	 		 		   		 		  
         incorrect = False  		   	  			  	 		  		  		    	 		 		   		 		  
         if len(in_trades_1.shape)!=2 or in_trades_1.shape[1]!=1:  		   	  			  	 		  		  		    	 		 		   		 		  
             incorrect=True  		   	  			  	 		  		  		    	 		 		   		 		  
