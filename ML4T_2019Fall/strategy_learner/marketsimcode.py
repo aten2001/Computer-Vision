@@ -27,7 +27,8 @@ GT ID: 903304661 (replace with your GT ID)
   		   	  			  	 		  		  		    	 		 		   		 		  
 import pandas as pd  		   	  			  	 		  		  		    	 		 		   		 		  
 import numpy as np  		   	  			  	 		  		  		    	 		 		   		 		  
-import datetime as dt  		   	  			  	 		  		  		    	 		 		   		 		  
+import datetime as dt
+from datetime import timedelta		   	  			  	 		  		  		    	 		 		   		 		  
 import os  		   	  			  	 		  		  		    	 		 		   		 		  
 from util import get_data, plot_data  		   	  			  	 		  		  		    	 		 		   		 		  
 
@@ -47,14 +48,17 @@ def compute_portvals(orders_df, start_val = 1000000, commission=9.95, impact=0.0
     #orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'] ).sort_index()
     orders = orders_df.sort_index()
     stocks = orders['Symbol'].unique().tolist()
-    start_date = orders.index[0]
+    start_date = orders.index[0] 
     end_date = orders.index[-1]
     dates=pd.date_range(start_date, end_date)
     orders.fillna(method='ffill', inplace=True)
     orders.fillna(method='backfill', inplace=True)
 
+    #print(orders)
     #get data and fill na
+    #print(dates)
     data = get_data(stocks, dates)
+    #print(data)
     data.fillna(method='ffill', inplace=True)
     data.fillna(method='backfill', inplace=True)
     data["cash_change"] = 1.0
@@ -73,6 +77,7 @@ def compute_portvals(orders_df, start_val = 1000000, commission=9.95, impact=0.0
         ticker = row[0]
         ord_type = row[1]
         shares = row[2]
+    
         value = data.loc[idx, ticker] * shares
         cost = value * impact + commission
         curr_shares = share_chg.loc[idx, ticker]

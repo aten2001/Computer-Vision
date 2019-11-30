@@ -48,6 +48,7 @@ def aroon(df_prices, ticker, results_df):
 def prepare_pricedf(symbol, startDate, endDate):
     time_period = pd.date_range(startDate, endDate)
     df_prices = util.get_data([symbol], time_period,False)
+    df_prices = df_prices.dropna()
     df_prices = df_prices.fillna(method='ffill')
     df_prices = df_prices.fillna(method='bfill')
     df_prices = df_prices / df_prices.iloc[0,]
@@ -105,7 +106,7 @@ def main():
     #end = dt.datetime(2011,12,31)
     start = dt.datetime(2008,1,1)
     end = dt.datetime(2009,12,31)
-    df_p = prepare_pricedf(start, end)
+    df_p = prepare_pricedf("JPM", start, end)
     
     
     rolling_avg(df_p, "JPM", df_p)
@@ -118,6 +119,7 @@ def main():
     plot_sma(df_p)
     plot_bb(df_p)
     plot_momentum(df_p)
+    print(df_p)
     
 
     #print(df_p)

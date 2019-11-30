@@ -32,7 +32,9 @@ import util as ut
 import random
 import QLearner as ql
 import indicators as ind
-import util as ut	   	  			  	 		  		  		    	 		 		   		 		  
+import util as ut
+import numpy as np 
+import marketsimcode as ms  	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 class StrategyLearner(object):
     LNG = 1
@@ -90,6 +92,7 @@ class StrategyLearner(object):
         if self.verbose: print(volume)
 
         df_p = self.get_indicators(symbol, sd, ed)
+        print(df_p)
         feats = self.discretize(df_p)
         #print(ind_normed)
         port_val = feats[symbol]
@@ -222,14 +225,57 @@ class StrategyLearner(object):
 
         df_trades = pd.concat([symbol_df, buy_sell, orders], axis=1)
         df_trades.columns = ['Symbol', 'Order', 'Shares']
-
+        
         df_trades = df_trades.drop('Symbol', axis=1)
         df_trades = df_trades.drop('Order', axis=1)
 
-        print(df_trades)
+        #print(df_trades)
         trades = df_trades
         
         return trades  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
+
+def compute_port_stats(portvals):
+        rfr = 0.0
+        sr = 252.0
+        portvals = portvals["portfolio_totals"]
+        cumulative_return = (portvals[-1]/portvals[0]) - 1
+        daily_ret = (portvals/portvals.shift(1)) - 1   
+        
+        avg_daily = daily_ret.mean()
+        std_daily = daily_ret.std()
+        diff = (daily_ret - rfr).mean()
+        sharpe = np.sqrt(sr) * (diff / std_daily)
+        return cumulative_return, avg_daily, std_daily, sharpe
+
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("One does not simply think up a strategy")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print("One does not simply think up a strategy")
+    sd=dt.datetime(2009,1,1)
+    ed=dt.datetime(2010,1,1)
+    sl = StrategyLearner()
+    sl.addEvidence(symbol="JPM")
+    df_trades = sl.testPolicy(symbol="JPM")
+
+    strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = compute_port_stats(strat_portvals)
+    strat_returns = strat_portvals["portfolio_totals"]
+
+    print(f"Date Range: {sd} to {ed}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Sharpe Ratio of Manual Strat: {sharpe_ratio}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    #print(f"Sharpe Ratio of Benchmark : {sharpe_ratio_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Cumulative Return of Manual Strat: {cum_ret}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    #print(f"Cumulative Return of Benchmark : {cum_ret_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Standard Deviation of Manual Strat: {std_daily_ret}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    #print(f"Standard Deviation of Benchmark : {std_daily_ret_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Average Daily Return of Manual Strat: {avg_daily_ret}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    #print(f"Average Daily Return of Benchmark : {avg_daily_ret_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print()  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Final Portfolio Value Manual Strat: {strat_returns[-1]}")
+    #print(f"Final Portfolio Value Benchmark: {bench_returns[-1]}")  
+    
+    
+    #print(df_trades)		  	 		  		  		    	 		 		   		 		  
