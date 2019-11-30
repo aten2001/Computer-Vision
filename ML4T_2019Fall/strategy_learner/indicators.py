@@ -119,7 +119,7 @@ def main():
     plot_sma(df_p)
     plot_bb(df_p)
     plot_momentum(df_p)
-    print(df_p)
+    #print(df_p)
     
 
     #print(df_p)

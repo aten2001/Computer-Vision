@@ -92,7 +92,7 @@ class StrategyLearner(object):
         if self.verbose: print(volume)
 
         df_p = self.get_indicators(symbol, sd, ed)
-        print(df_p)
+        #print(df_p)
         feats = self.discretize(df_p)
         #print(ind_normed)
         port_val = feats[symbol]
@@ -279,3 +279,7 @@ if __name__=="__main__":
     
     
     #print(df_trades)		  	 		  		  		    	 		 		   		 		  
+
+#TODO: Spice Up code np.rolling() instead of np.iterrows for speed, stop Q learning when convergence reached etc
+# experiment code (just keep it within Strat Learner)
+# Spice up descritize (weight each indicator differently)
