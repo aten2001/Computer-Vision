@@ -248,7 +248,7 @@ class StrategyLearner(object):
                 buy_s.append("SELL")
             elif order > 0:
                 buy_s.append("BUY")
-        #abs_orders = [abs(x) for x in share_orders]
+        abs_orders = [abs(x) for x in share_orders]
         symbols=[]
         for i in range(len(share_orders)):
             symbols.append(symbol)
@@ -259,8 +259,17 @@ class StrategyLearner(object):
         df_trades.index.name = "Date"
         df_trades = df_trades.drop('Symbol', axis=1)
         trades = df_trades
+
         
-        return trades  		   	  			  	 		  		  		    	 		 		   		 		  
+        df_trades_test = pd.DataFrame(data = symbols, index = dates, columns = ['Symbol'])
+        df_trades_test["Order"] = buy_s
+        df_trades_test["Shares"] = abs_orders
+        df_trades_test.index.name = "Date"
+
+        #print(trades)
+        #print(df_trades_test)
+        #switch to df_trades_test for experiment1.py
+        return trades 		   	  			  	 		  		  		    	 		 		   		 		  
 
 def cumulative_return(portvals):
     cumulative_return, avg_daily, std_daily, sharpe = compute_port_stats(portvals)
@@ -268,7 +277,7 @@ def cumulative_return(portvals):
 
 def get_pctReturn(feats,symbol):
     pct_return = feats[symbol]
-    pct_return[1:] = (feats[symbol][1:] / feats[symbol][:-1].values) - 1
+    pct_return[1:] = (pct_return[1:] / pct_return[:-1].values) - 1
     return pct_return
 
 def compute_port_stats(portvals):
