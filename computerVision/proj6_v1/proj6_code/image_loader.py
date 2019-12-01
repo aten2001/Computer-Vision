@@ -61,7 +61,7 @@ class ImageLoader(data.Dataset):
     # Student code begin
     ###########################################################################
     #path = "data" + "/**/*.jpg"
-    print(class_labels)
+    #print(class_labels)
     if (self.curr_folder == "data/train"):
       self.curr_folder = "../" + self.curr_folder
     
@@ -133,7 +133,10 @@ class ImageLoader(data.Dataset):
     ###########################################################################
     # Student code begin
     ###########################################################################
-
+    #print(path)
+    img = Image.open(path)
+    img = img.convert('L')
+    
     
 
     ###########################################################################
@@ -164,8 +167,9 @@ class ImageLoader(data.Dataset):
     ###########################################################################
     # Student code start
     ############################################################################
-
-    
+    img =  self.load_img_from_path(self.dataset[index][0])
+    class_idx = self.dataset[index][1]
+    img = self.transform(img)
 
     ############################################################################
     # Student code end

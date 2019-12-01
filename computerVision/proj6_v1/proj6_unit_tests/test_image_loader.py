@@ -84,13 +84,13 @@ def test_load_img_from_path():
     test_image_loader = ImageLoader(root_dir='data/', split='train', transform=get_fundamental_transforms(
         inp_size=(64, 64), pixel_mean=np.array([0.01]), pixel_std=np.array([1.001])
     ))
-    im_path = 'data/train/bedroom/image_0003.jpg'
+    im_path = 'data/train/Bedroom/image_0003.jpg'
   except:
     test_image_loader = ImageLoader(root_dir='../data/', split='test', transform=get_fundamental_transforms(
         inp_size=(64, 64), pixel_mean=np.array([0.01]), pixel_std=np.array([1.001])
     ))
 
-    im_path = '../data/train/bedroom/image_0003.jpg'
+    im_path = '../data/train/Bedroom/image_0003.jpg'
 
   im_np = np.asarray(test_image_loader.load_img_from_path(im_path))
 
