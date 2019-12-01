@@ -14,13 +14,29 @@ class SimpleNet(nn.Module):
 
     self.cnn_layers = nn.Sequential()
     self.fc_layers = nn.Sequential()
-    self.loss_criterion = None
+    self.loss_criterion = nn.MSELoss(reduction="sum")
 
     ###########################################################################
     # Student code begin
     ###########################################################################
 
-    raise NotImplementedError('__init__ not implemented')
+    self.cnn_layers = nn.Sequential(
+      nn.Conv2d(1, 64, kernel_size=5),
+      nn.ReLU(),
+      nn.MaxPool2d(kernel_size=3, stride=2),
+
+      nn.Conv2d(10, 20, kernel_size=5),
+      nn.ReLU(),
+      nn.MaxPool2d(kernel_size=3, stride=2),
+      )
+
+    self.fc_layers(
+      nn.Linear(500,100),
+      nn.ReLU(),
+      nn.Linear(100,15),
+    )
+
+
 
     ###########################################################################
     # Student code end
@@ -40,7 +56,9 @@ class SimpleNet(nn.Module):
     # Student code begin
     ###########################################################################
 
-    raise NotImplementedError('forward not implemented')
+    x = self.cnn_layers(x)
+    x = torch.flatten(x, 1)
+    model_output = self.fc_layers(x)
 
     ###########################################################################
     # Student code end
