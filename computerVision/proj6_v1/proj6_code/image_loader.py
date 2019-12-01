@@ -60,8 +60,18 @@ class ImageLoader(data.Dataset):
     ###########################################################################
     # Student code begin
     ###########################################################################
-
-    raise NotImplementedError('load_imagepaths_with_labels not implemented')
+    #path = "data" + "/**/*.jpg"
+    print(class_labels)
+    if (self.curr_folder == "data/train"):
+      self.curr_folder = "../" + self.curr_folder
+    
+    path = self.curr_folder + "/**/*.jpg"
+    
+    for file_path in glob.glob(path, recursive=True):
+      img_class = file_path.split("/")[3]
+      class_label = class_labels[img_class]
+      img_paths.append((file_path, class_label))
+      
 
     ###########################################################################
     # Student code end
@@ -80,8 +90,26 @@ class ImageLoader(data.Dataset):
     ###########################################################################
     # Student code begin
     ###########################################################################
+    names = []
+    for folder in os.listdir(self.curr_folder):
+      names.append(folder)
+    
+    classes['Bedroom'] = 11
+    classes['Coast'] = 12
+    classes['Forest'] = 7
+    classes['Highway'] = 14
+    classes['Industrial'] = 1
+    classes['InsideCity'] = 3
+    classes['Kitchen'] = 4
+    classes['LivingRoom'] = 9
+    classes['Mountain'] = 6
+    classes['Office'] = 2
+    classes['OpenCountry'] = 0
+    classes['Store'] = 8
+    classes['Street'] = 10
+    classes[ 'Suburb'] = 13
+    classes[ 'TallBuilding'] = 5
 
-    raise NotImplementedError('get_classes not implemented')
 
     ###########################################################################
     # Student code end
@@ -106,7 +134,7 @@ class ImageLoader(data.Dataset):
     # Student code begin
     ###########################################################################
 
-    raise NotImplementedError('load_img_from_path not implemented')
+    
 
     ###########################################################################
     # Student code end
@@ -137,7 +165,7 @@ class ImageLoader(data.Dataset):
     # Student code start
     ############################################################################
 
-    raise NotImplementedError('__getitem__ not implemented')
+    
 
     ############################################################################
     # Student code end
@@ -158,7 +186,14 @@ class ImageLoader(data.Dataset):
     # Student code start
     ############################################################################
 
-    raise NotImplementedError('__len__ not implemented')
+    if (self.curr_folder == "data/train"):
+      self.curr_folder = "../" + self.curr_folder
+    
+    path = self.curr_folder + "/**/*.jpg"
+    
+    for file_path in glob.glob(path, recursive=True):
+      l+=1
+    print(l)
 
     ############################################################################
     # Student code end

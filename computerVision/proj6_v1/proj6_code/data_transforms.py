@@ -28,8 +28,11 @@ def get_fundamental_transforms(inp_size: Tuple[int, int],
   # Student code begin
   #############################################################################
 
-  raise NotImplementedError('get_fundamental_transforms not implemented')
-
+  fundamental_transforms = transforms.Compose([
+     transforms.Resize(inp_size),
+     transforms.ToTensor(),
+     transforms.Normalize(pixel_mean, pixel_std),
+    ])
   #############################################################################
   # Student code end
   #############################################################################
