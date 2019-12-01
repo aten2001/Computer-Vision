@@ -25,7 +25,8 @@ Student Name: Tucker Balch (replace with your name)
 GT User ID: shollister7 (replace with your User ID)  		   	  			  	 		  		  		    	 		 		   		 		  
 GT ID: 903304661 (replace with your GT ID)  		   	  			  	 		  		  		    	 		 		   		 		  
 """  		   	  			  	 		  		  		    	 		 		   		 		  
-  		   	  			  	 		  		  		    	 		 		   		 		  
+
+import matplotlib.pyplot as plt   	  			  	 		  		  		    	 		 		   		 		  
 import datetime as dt  		   	  			  	 		  		  		    	 		 		   		 		  
 import pandas as pd  		   	  			  	 		  		  		    	 		 		   		 		  
 import util as ut  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -34,7 +35,8 @@ import QLearner as ql
 import indicators as ind
 import util as ut
 import numpy as np 
-import marketsimcode as ms  	  			  	 		  		  		    	 		 		   		 		  
+import marketsimcode as ms
+import ManualStrategy as man	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
 class StrategyLearner(object):
     LNG = 1
@@ -94,7 +96,8 @@ class StrategyLearner(object):
         df_p = self.get_indicators(symbol, sd, ed)
         feats = self.discretize(df_p)
         #print(df_p)
-        pct_return = get_pctReturn(feats, symbol)
+        pct_return = feats[symbol].copy()
+        pct_return[1:] = (pct_return[1:] / pct_return[:-1].values) - 1
         init_state = feats.iloc[0]['state']
         self.q_l.querysetstate(int(float(init_state)))
         i = 0
@@ -167,7 +170,7 @@ class StrategyLearner(object):
 
             strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
             cum_returns[i] = cumulative_return(strat_portvals)
-            if (i > 20 and cum_returns[i] <= cum_returns[i - 5]):
+            if (i > 20 and cum_returns[i] <= cum_returns[i - 10]):
                 break
 
     def author(self):
@@ -269,16 +272,24 @@ class StrategyLearner(object):
         #print(trades)
         #print(df_trades_test)
         #switch to df_trades_test for experiment1.py
-        return trades 		   	  			  	 		  		  		    	 		 		   		 		  
+        #print(df_trades_test)
+        return trades		   	  			  	 		  		  		    	 		 		   		 		  
 
 def cumulative_return(portvals):
     cumulative_return, avg_daily, std_daily, sharpe = compute_port_stats(portvals)
     return cumulative_return
 
-def get_pctReturn(feats,symbol):
-    pct_return = feats[symbol]
-    pct_return[1:] = (pct_return[1:] / pct_return[:-1].values) - 1
-    return pct_return
+
+def create_benchmark_tradesDF(df_prices, symbol="JPM"):
+        dates = []
+        dates.append(df_prices.index[3])
+        dates.append(df_prices.index[len(df_prices.index)-2])
+        symbols = [symbol,symbol]
+        df_trades = pd.DataFrame(data = symbols, index = dates, columns = ['Symbol'])
+        df_trades["Order"] = ["BUY", "SELL"]
+        df_trades["Shares"] = [1000, 1000]
+        df_trades.index.name = "Date"
+        return df_trades
 
 def compute_port_stats(portvals):
         rfr = 0.0
@@ -294,37 +305,4 @@ def compute_port_stats(portvals):
         return cumulative_return, avg_daily, std_daily, sharpe
 
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("One does not simply think up a strategy")
-    sd=dt.datetime(2009,1,1)
-    ed=dt.datetime(2010,1,1)
-    sl = StrategyLearner()
-    sl.addEvidence(symbol="JPM")
-    df_trades = sl.testPolicy(symbol="JPM")
-
-    strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
-    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = compute_port_stats(strat_portvals)
-    strat_returns = strat_portvals["portfolio_totals"]
-
-    print(f"Date Range: {sd} to {ed}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Sharpe Ratio of Manual Strat: {sharpe_ratio}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    #print(f"Sharpe Ratio of Benchmark : {sharpe_ratio_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Cumulative Return of Manual Strat: {cum_ret}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    #print(f"Cumulative Return of Benchmark : {cum_ret_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Standard Deviation of Manual Strat: {std_daily_ret}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    #print(f"Standard Deviation of Benchmark : {std_daily_ret_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Average Daily Return of Manual Strat: {avg_daily_ret}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    #print(f"Average Daily Return of Benchmark : {avg_daily_ret_bench}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Final Portfolio Value Manual Strat: {strat_returns[-1]}")
-    #print(f"Final Portfolio Value Benchmark: {bench_returns[-1]}")  
-    
-    
-    #print(df_trades)		  	 		  		  		    	 		 		   		 		  
-
-#TODO: Spice Up code np.rolling() instead of np.iterrows for speed, stop Q learning when convergence reached etc
-# experiment code (just keep it within Strat Learner)
-# Spice up descritize (weight each indicator differently)
+    print("One does not simply think up a strategy")	  	 		  		  		    	 		 		   		 		  

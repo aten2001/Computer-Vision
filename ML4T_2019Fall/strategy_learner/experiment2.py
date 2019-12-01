@@ -40,33 +40,50 @@ def experiment1():
     start_val = 100000
     symbol = "JPM"
     commission = 9.95
-    impact = 0.005
     num_shares = 1000
     sd=dt.datetime(2008,1,1)
     ed=dt.datetime(2009,12,31)
 
-    #In-Sample Q-Learning Strat Port Stats
+    #Normal Impact
     seed = 1021080103
     #seed = 1001090000
     #seed = 1111090000
     np.random.seed(seed)  		   	  			  	 		  		  		    	 		 		   		 		  
     random.seed(seed)
+    impact = 0.005
     stl = StrategyLearner.StrategyLearner( impact=impact)
     stl.addEvidence(symbol=symbol, sd=sd, ed=ed)
-    df_trades = stl.testPolicy(symbol=symbol, sd=sd, ed=ed)
-    df_trades = reformat_trades(symbol, df_trades)
-    strat_portvals = ms.compute_portvals(df_trades, start_val=100000, commission=9.95, impact=0.005)
+    df_trades_norm = stl.testPolicy(symbol=symbol, sd=sd, ed=ed)
+    df_trades_norm = reformat_trades(symbol, df_trades_norm)
+    num_trades_norm = df_trades_norm.shape[0]
+    strat_portvals = ms.compute_portvals(df_trades_norm, start_val=100000, commission=9.95, impact=0.005)
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = compute_port_stats(strat_portvals)
     strat_returns = strat_portvals["portfolio_totals"]
     normed_strat_returns = strat_portvals["portfolio_totals"] / strat_portvals["portfolio_totals"][0]
 
-    #Man Strat Port Stats
-    man = ManualStrategy.ManualStrategy()
-    man_trades_df = man.testPolicy(symbol=symbol, sd=sd, ed=ed)
-    man_portvals = ms.compute_portvals(man_trades_df, start_val=100000, commission=9.95, impact=0.005)
-    cum_retM, avg_daily_retM, std_daily_retM, sharpe_ratioM = compute_port_stats(man_portvals)
-    man_returns = man_portvals["portfolio_totals"]
-    normed_man_returns = man_portvals["portfolio_totals"] / man_portvals["portfolio_totals"][0]
+    #No Impact
+    impact = 0.0
+    stl = StrategyLearner.StrategyLearner( impact=impact)
+    stl.addEvidence(symbol=symbol, sd=sd, ed=ed)
+    df_trades_z = stl.testPolicy(symbol=symbol, sd=sd, ed=ed)
+    df_trades_z = reformat_trades(symbol, df_trades_z)
+    num_trades_zero = df_trades_z.shape[0]
+    z_portvals = ms.compute_portvals(df_trades_z, start_val=100000, commission=9.95, impact=0.005)
+    cum_retZ, avg_daily_retZ, std_daily_retZ, sharpe_ratioZ = compute_port_stats(z_portvals)
+    z_returns = z_portvals["portfolio_totals"]
+    normed_z_returns = z_portvals["portfolio_totals"] / z_portvals["portfolio_totals"][0]
+
+    #High Impact Stats
+    impact = 0.99
+    stl = StrategyLearner.StrategyLearner( impact=impact)
+    stl.addEvidence(symbol=symbol, sd=sd, ed=ed)
+    df_trades_h = stl.testPolicy(symbol=symbol, sd=sd, ed=ed)
+    df_trades_h = reformat_trades(symbol, df_trades_h)
+    num_trades_high = df_trades_h.shape[0]
+    h_portvals = ms.compute_portvals(df_trades_h, start_val=100000, commission=9.95, impact=0.005)
+    cum_ret_h, avg_daily_ret_h, std_daily_ret_h, sharpe_ratio_H = compute_port_stats(h_portvals)
+    h_returns = h_portvals["portfolio_totals"]
+    normed_h_returns = h_portvals["portfolio_totals"] / h_portvals["portfolio_totals"][0]
 
     #Benchmark Stats
     df_prices = ind.prepare_pricedf(symbol, sd, ed)
@@ -78,33 +95,42 @@ def experiment1():
 
     print(f"Date Range: {sd} to {ed}")  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Sharpe Ratio of Q Strat: {sharpe_ratio}")
-    print(f"Sharpe Ratio of Man Strat: {sharpe_ratioM}")  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Sharpe Ratio of Benchmark : {sharpe_ratioB}")   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Sharpe Ratio of Normal Impact: {sharpe_ratio}")
+    print(f"Sharpe Ratio of Zero Impact: {sharpe_ratioZ}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Sharpe Ratio of High Impact: {sharpe_ratio_H}")
+    print(f"Sharpe Ratio of Benchmark : {sharpe_ratioB}") 	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Cumulative Return of Q Strat: {cum_ret}")
-    print(f"Cumulative Return of Man Strat : {cum_retM}")		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Cumulative Return of Normal Impact: {cum_ret}")
+    print(f"Cumulative Return of Zero Impact : {cum_retZ}")		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Cumulative Return of High Impact : {cum_ret_h}")
     print(f"Cumulative Return of Benchmark : {cum_retB}")  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Standard Deviation of Q Strat: {std_daily_ret}")
-    print(f"Standard Deviation of Man Strat : {std_daily_retM}") 		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Standard Deviation of Benchmark : {std_daily_retB}")  		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Standard Deviation of Normal Impact: {std_daily_ret}")
+    print(f"Standard Deviation of Zero Impact : {std_daily_retZ}") 		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Standard Deviation of High Impact: {std_daily_ret_h}")
+    print(f"Standard Deviation of Benchmark : {std_daily_retB}") 		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Average Daily Return of Q Strat: {avg_daily_ret}")
-    print(f"Average Daily Return of Man Strat : {avg_daily_retM}") 		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Average Daily Return of Normal Impact: {avg_daily_ret}")
+    print(f"Average Daily Return of Zero Impact : {avg_daily_retZ}") 		   	  			  	 		  		  		    	 		 		   		 		  
+    print(f"Average Daily Return of High Impact : {avg_daily_ret_h}")
     print(f"Average Daily Return of Benchmark : {avg_daily_retB}")  		   	  			  	 		  		  		    	 		 		   		 		  
     print()  		   	  			  	 		  		  		    	 		 		   		 		  
-    print(f"Final Portfolio Value Q Strat: {strat_returns[-1]}")
-    print(f"Final Portfolio Value Man Strat: {man_returns[-1]}")
+    print(f"Final Portfolio Value Normal Impact: {strat_returns[-1]}")
+    print(f"Final Portfolio Value Zero Impact: {z_returns[-1]}")
+    print(f"Final Portfolio Value High Impact: { h_returns[-1]}")
     print(f"Final Portfolio Value Benchmark: {bench_returns[-1]}")
+    print()
+    print("Num Trades Normal Impact: {}".format(num_trades_norm))
+    print("Num Trades High Impact: {}".format(num_trades_high))
+    print("Num Trades Zero Impact: {}".format(num_trades_zero))
 
-    chart_df = pd.concat([normed_strat_returns, normed_man_returns, normed_bench_returns], axis=1)
-    chart_df.columns = ['Q-Learning Strategy', 'Manual Strategy', 'Benchmark']
-    chart_df.plot(grid=True, title='Strategy Learner vs Manual Strategy vs Benchmark (In-Sample)', use_index=True, color=['Red', 'Blue', 'Black'])
+    chart_df = pd.concat([normed_strat_returns, normed_z_returns, normed_h_returns, normed_bench_returns], axis=1)
+    chart_df.columns = ['0.005 Impact', '0 Impact', '0.99 Impact', 'Benchmark']
+    chart_df.plot(grid=True, title='Normal Impact vs No Impact vs High Impact(In-Sample)', use_index=True, color=['Red', 'Blue', 'Black', "Green"])
     #plt.show()
     plt.xlabel('Returns Normalized', fontsize=10)
     plt.ylabel('Dates', fontsize=10)
-    plt.savefig("experiment1.png")
+    plt.savefig("experiment2.png")
 
 def reformat_trades(symbol, df_trades):
     orders = []
