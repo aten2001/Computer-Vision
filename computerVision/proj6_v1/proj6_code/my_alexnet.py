@@ -36,11 +36,14 @@ class MyAlexNet(nn.Module):
     for param in model.parameters():
       param.requires_grad = False
 
-    self.cnn_layers = nn.Sequential(*list(model.children())[:-2])
-    #for param in self.cnn_layers.parameters():
-      #param.requires_grad = False
+
+    self.cnn_layers = nn.Sequential(*list(model.children())[:-1])
+    for layer in self.cnn_layers[0]:
+      if (not isinstance(layer, nn.ReLU) and not isinstance(layer, nn.MaxPool2d)):
+        layer.weight.requires_grad = False
+        layer.bias.requires_grad = False
+  
     self.fc_layers = nn.Sequential(
-            nn.Dropout(),
             nn.Linear(256 * 6 * 6, 4096),
             nn.ReLU(inplace=True),
             nn.Dropout(),
@@ -48,8 +51,12 @@ class MyAlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, 15),
     )
-
-    
+    c = 0
+    for layer in self.fc_layers:
+      if (not isinstance(layer, nn.ReLU) and not isinstance(layer, nn.Dropout) and c != 5):
+        layer.weight.requires_grad = False
+        layer.bias.requires_grad = False
+      c += 1
 
 
     ###########################################################################
