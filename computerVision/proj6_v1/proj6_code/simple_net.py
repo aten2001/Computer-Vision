@@ -22,12 +22,12 @@ class SimpleNet(nn.Module):
 
     self.cnn_layers = nn.Sequential(
       nn.Conv2d(1, 10, kernel_size=5),
-      nn.ReLU(),
       nn.MaxPool2d(kernel_size=3, stride=1),
+      nn.ReLU(),
 
       nn.Conv2d(10, 20, kernel_size=5),
-      nn.ReLU(),
       nn.MaxPool2d(kernel_size=3, stride=11),
+      nn.ReLU(),
       )
 
     self.fc_layers = nn.Sequential(

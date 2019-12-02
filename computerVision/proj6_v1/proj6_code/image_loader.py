@@ -197,7 +197,7 @@ class ImageLoader(data.Dataset):
     
     for file_path in glob.glob(path, recursive=True):
       l+=1
-    print(l)
+    #print(l)
 
     ############################################################################
     # Student code end

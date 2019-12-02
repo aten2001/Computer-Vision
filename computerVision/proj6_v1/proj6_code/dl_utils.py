@@ -15,8 +15,8 @@ def predict_labels(model: torch.nn.Module, x: torch.tensor) -> torch.tensor:
   Returns:
   -   predicted_labels: the output labels [Dim: (N,)]
   '''
-  print(x.shape)
-  print(x)
+  #print(x.shape)
+  #print(x)
   predicted_labels = None
 
   #############################################################################
@@ -24,7 +24,8 @@ def predict_labels(model: torch.nn.Module, x: torch.tensor) -> torch.tensor:
   #############################################################################
 
   predicted_labels = model(x)
-  predicted_labels = torch.argmax(predicted_labels)
+  predicted_labels = torch.argmax(predicted_labels, dim=1)
+  #print(predicted_labels)
   
   
 
