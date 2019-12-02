@@ -102,8 +102,8 @@ def experiment1():
     chart_df.columns = ['Q-Learning Strategy', 'Manual Strategy', 'Benchmark']
     chart_df.plot(grid=True, title='Strategy Learner vs Manual Strategy vs Benchmark (In-Sample)', use_index=True, color=['Red', 'Blue', 'Black'])
     #plt.show()
-    plt.xlabel('Returns Normalized', fontsize=10)
-    plt.ylabel('Dates', fontsize=10)
+    plt.ylabel('Returns Normalized', fontsize=10)
+    plt.xlabel('Dates', fontsize=10)
     plt.savefig("experiment1.png")
 
 def reformat_trades(symbol, df_trades):

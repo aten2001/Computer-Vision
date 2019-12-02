@@ -128,8 +128,8 @@ def experiment1():
     chart_df.columns = ['0.005 Impact', '0 Impact', '0.99 Impact', 'Benchmark']
     chart_df.plot(grid=True, title='Normal Impact vs No Impact vs High Impact(In-Sample)', use_index=True, color=['Red', 'Blue', 'Black', "Green"])
     #plt.show()
-    plt.xlabel('Returns Normalized', fontsize=10)
-    plt.ylabel('Dates', fontsize=10)
+    plt.ylabel('Returns Normalized', fontsize=10)
+    plt.xlabel('Dates', fontsize=10)
     plt.savefig("experiment2.png")
 
 def reformat_trades(symbol, df_trades):
