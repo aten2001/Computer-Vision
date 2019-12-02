@@ -21,7 +21,7 @@ class MyAlexNet(nn.Module):
 
     self.cnn_layers = nn.Sequential()
     self.fc_layers = nn.Sequential()
-    self.loss_criterion = None
+    self.loss_criterion = nn.CrossEntropyLoss(reduction="sum")
 
     ###########################################################################
     # Student code begin
@@ -32,7 +32,25 @@ class MyAlexNet(nn.Module):
 
     # take care to turn off gradients for both weight and bias
 
-    raise NotImplementedError('__init__ not implemented')
+    model = alexnet(pretrained=True)
+    for param in model.parameters():
+      param.requires_grad = False
+
+    self.cnn_layers = nn.Sequential(*list(model.children())[:-2])
+    #for param in self.cnn_layers.parameters():
+      #param.requires_grad = False
+    self.fc_layers = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, 15),
+    )
+
+    
+
 
     ###########################################################################
     # Student code end
@@ -55,7 +73,10 @@ class MyAlexNet(nn.Module):
     # Student code begin
     ###########################################################################
 
-    raise NotImplementedError('forward not implemented')
+    x = self.cnn_layers(x)
+    x = torch.flatten(x, 1)
+    x = self.fc_layers(x)
+    model_output = x
 
     ###########################################################################
     # Student code end
