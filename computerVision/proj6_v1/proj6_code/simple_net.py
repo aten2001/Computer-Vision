@@ -14,23 +14,23 @@ class SimpleNet(nn.Module):
 
     self.cnn_layers = nn.Sequential()
     self.fc_layers = nn.Sequential()
-    self.loss_criterion = nn.MSELoss(reduction="sum")
+    self.loss_criterion = nn.CrossEntropyLoss(reduction="sum")
 
     ###########################################################################
     # Student code begin
     ###########################################################################
 
     self.cnn_layers = nn.Sequential(
-      nn.Conv2d(1, 64, kernel_size=5),
+      nn.Conv2d(1, 10, kernel_size=5),
       nn.ReLU(),
-      nn.MaxPool2d(kernel_size=3, stride=2),
+      nn.MaxPool2d(kernel_size=3, stride=1),
 
       nn.Conv2d(10, 20, kernel_size=5),
       nn.ReLU(),
-      nn.MaxPool2d(kernel_size=3, stride=2),
+      nn.MaxPool2d(kernel_size=3, stride=11),
       )
 
-    self.fc_layers(
+    self.fc_layers = nn.Sequential(
       nn.Linear(500,100),
       nn.ReLU(),
       nn.Linear(100,15),
@@ -57,7 +57,11 @@ class SimpleNet(nn.Module):
     ###########################################################################
 
     x = self.cnn_layers(x)
-    x = torch.flatten(x, 1)
+    #print(x.shape)
+    
+    #x = torch.flatten(x, 1)
+    x = x.view(-1, 500)
+    
     model_output = self.fc_layers(x)
 
     ###########################################################################

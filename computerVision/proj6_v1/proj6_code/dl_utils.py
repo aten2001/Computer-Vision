@@ -15,14 +15,18 @@ def predict_labels(model: torch.nn.Module, x: torch.tensor) -> torch.tensor:
   Returns:
   -   predicted_labels: the output labels [Dim: (N,)]
   '''
-
+  print(x.shape)
+  print(x)
   predicted_labels = None
 
   #############################################################################
   # Student code begin
   #############################################################################
 
-  raise NotImplementedError('predict_labels not implemented')
+  predicted_labels = model(x)
+  predicted_labels = torch.argmax(predicted_labels)
+  
+  
 
   #############################################################################
   # Student code end
@@ -52,7 +56,11 @@ def compute_loss(model: torch.nn.Module,
   # Student code begin
   #############################################################################
 
-  raise NotImplementedError('compute_loss not implemented')
+  
+  loss = model.loss_criterion(model_output,target_labels)
+  if is_normalize:
+    loss = loss / model_output.shape[0]
+
 
   #############################################################################
   # Student code end
