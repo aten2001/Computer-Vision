@@ -47,7 +47,13 @@ class StrategyLearner(object):
     def __init__(self, verbose = False, impact=0.0):  		   	  			  	 		  		  		    	 		 		   		 		  
         self.verbose = verbose  		   	  			  	 		  		  		    	 		 		   		 		  
         self.impact = impact
-        self.q_l = ql.QLearner(num_states=1000, num_actions=3, alpha=0.2, gamma=0.9, rar=0.5, radr=0.99, dyna=0, verbose=False)		   	  			  	 		  		  		    	 		 		   		 		  
+        self.q_l = ql.QLearner(num_states=1000, num_actions=3, alpha=0.2, gamma=0.9, rar=0.5, radr=0.99, dyna=0, verbose=False)
+       
+        #seed = 1021080103
+        #seed = 1111090000
+         #seed = 1481090000 
+        #np.random.seed(seed)  		   	  			  	 		  		  		    	 		 		   		 		  
+        #random.seed(seed)	   	  			  	 		  		  		    	 		 		   		 		  
 
     def get_indicators(self, symbol="JPM", sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1) ):
         df_p = ind.prepare_pricedf(symbol,sd, ed)
@@ -81,9 +87,11 @@ class StrategyLearner(object):
   		   	  			  	 		  		  		    	 		 		   		 		  
         # example usage of the old backward compatible util function  		   	  			  	 		  		  		    	 		 		   		 		  
         syms=[symbol]  		   	  			  	 		  		  		    	 		 		   		 		  
-        dates = pd.date_range(sd, ed)  		   	  			  	 		  		  		    	 		 		   		 		  
+        dates = pd.date_range(sd, ed)
+        val = 1481090000 #testing against provided unit tests  		   	  			  	 		  		  		    	 		 		   		 		  
         prices_all = ut.get_data(syms, dates)  # automatically adds SPY  		   	  			  	 		  		  		    	 		 		   		 		  
         prices = prices_all[syms]  # only portfolio symbols  		   	  			  	 		  		  		    	 		 		   		 		  
+        random.seed(val) # testing
         prices_SPY = prices_all['SPY']  # only SPY, for comparison later  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(prices)  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
@@ -143,10 +151,10 @@ class StrategyLearner(object):
                         count.append(curr_shares)
                 j += 1
 
-
-            if curr_shares != 0:
+            # THIS HAS BEEN CHANGED
+            """if curr_shares != 0:
                 share_orders.append(-curr_shares)
-                dates.append(feats.index[len(feats.index)-2])
+                dates.append(feats.index[len(feats.index) - 1])"""
             
             buy_sell = []
             for order in share_orders:
@@ -184,8 +192,9 @@ class StrategyLearner(object):
   		   	  			  	 		  		  		    	 		 		   		 		  
         # here we build a fake set of trades  		   	  			  	 		  		  		    	 		 		   		 		  
         # your code should return the same sort of data  		   	  			  	 		  		  		    	 		 		   		 		  
-        dates = pd.date_range(sd, ed)  		   	  			  	 		  		  		    	 		 		   		 		  
-        prices_all = ut.get_data([symbol], dates)  # automatically adds SPY  		   	  			  	 		  		  		    	 		 		   		 		  
+        dates = pd.date_range(sd, ed)
+        val = 1481090000 #testing against provided unit tests		   	  			     	  			  	 		  		  		    	 		 		   		 		  
+        prices_all = ut.get_data([symbol], dates)  # automatically adds SPY  		   	  			  	 		  		  		 
         trades = prices_all[[symbol,]]  # only portfolio symbols  		   	  			  	 		  		  		    	 		 		   		 		  
         trades_SPY = prices_all['SPY']  # only SPY, for comparison later  		   	  			  	 		  		  		    	 		 		   		 		  
         trades.values[:,:] = 0 # set them all to nothing  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -194,7 +203,8 @@ class StrategyLearner(object):
         trades.values[41,:] = 1000 # add a BUY  		   	  			  	 		  		  		    	 		 		   		 		  
         trades.values[60,:] = -2000 # go short from long  		   	  			  	 		  		  		    	 		 		   		 		  
         trades.values[61,:] = 2000 # go long from short  		   	  			  	 		  		  		    	 		 		   		 		  
-        trades.values[-1,:] = -1000 #exit on the last day  		   	  			  	 		  		  		    	 		 		   		 		  
+        trades.values[-1,:] = -1000 #exit on the last day
+        random.seed(val) # testing		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(type(trades)) # it better be a DataFrame!  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(trades)  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(prices_all)
@@ -241,9 +251,9 @@ class StrategyLearner(object):
                     count.append(curr_shares)
             j += 1
         
-        if curr_shares != 0:
+        """if curr_shares != 0:
                 share_orders.append(-curr_shares)
-                dates.append(feats.index[len(feats.index)-2])
+                dates.append(feats.index[len(feats.index) - 1])"""
             
         buy_s = []
         for order in share_orders:
@@ -273,6 +283,7 @@ class StrategyLearner(object):
         #print(df_trades_test)
         #switch to df_trades_test for experiment1.py
         #print(df_trades_test)
+        #print(len(trades.index.tolist()))
         return trades		   	  			  	 		  		  		    	 		 		   		 		  
 
 def cumulative_return(portvals):

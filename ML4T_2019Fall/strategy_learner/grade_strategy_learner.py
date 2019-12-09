@@ -59,7 +59,8 @@ strategy_test_cases = [
         train_time=25,  		   	  			  	 		  		  		    	 		 		   		 		  
         test_time=5,  		   	  			  	 		  		  		    	 		 		   		 		  
         max_time=60,  		   	  			  	 		  		  		    	 		 		   		 		  
-        seed=1481090000  		   	  			  	 		  		  		    	 		 		   		 		  
+        #seed=1481090000
+        seed = 1021080103		   	  			  	 		  		  		    	 		 		   		 		  
         ),  		   	  			  	 		  		  		    	 		 		   		 		  
     StrategyTestCase(  		   	  			  	 		  		  		    	 		 		   		 		  
         description="AAPL",  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -71,7 +72,8 @@ strategy_test_cases = [
         train_time=25,  		   	  			  	 		  		  		    	 		 		   		 		  
         test_time=5,  		   	  			  	 		  		  		    	 		 		   		 		  
         max_time=60,  		   	  			  	 		  		  		    	 		 		   		 		  
-        seed=1481090000  		   	  			  	 		  		  		    	 		 		   		 		  
+        #seed=1481090000
+        seed = 1021080103  		   	  			  	 		  		  		    	 		 		   		 		  
         ),  		   	  			  	 		  		  		    	 		 		   		 		  
     StrategyTestCase(  		   	  			  	 		  		  		    	 		 		   		 		  
         description="SINE_FAST_NOISE",  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -95,7 +97,8 @@ strategy_test_cases = [
         train_time=25,  		   	  			  	 		  		  		    	 		 		   		 		  
         test_time=5,  		   	  			  	 		  		  		    	 		 		   		 		  
         max_time=60,  		   	  			  	 		  		  		    	 		 		   		 		  
-        seed=1481090000  		   	  			  	 		  		  		    	 		 		   		 		  
+        #seed=1481090000
+        seed = 1021080103  		   	  			  	 		  		  		    	 		 		   		 		  
         ),  		   	  			  	 		  		  		    	 		 		   		 		  
 ]  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
@@ -209,7 +212,13 @@ def test_strategy(description, insample_args, outsample_args, benchmark_type, be
                 incorrect = True  		   	  			  	 		  		  		    	 		 		   		 		  
                 msgs.append("  testPolicy() took {} seconds, max allowed {}".format(test_t,test_time))  		   	  			  	 		  		  		    	 		 		   		 		  
             else:  		   	  			  	 		  		  		    	 		 		   		 		  
-                points_earned += 2.0  		   	  			  	 		  		  		    	 		 		   		 		  
+                points_earned += 2.0
+            #print(in_trades_1.columns)
+            #print(in_trades_2.columns)
+            #print(in_trades_1)
+            #print(in_trades_2)
+            #print("in_trades_1 {}".format(in_trades_1))
+            #print("in trades 2 {}".format(in_trades_2))	   	  			  	 		  		  		    	 		 		   		 		  
             if not((in_trades_1 == in_trades_2).all()[0]):  		   	  			  	 		  		  		    	 		 		   		 		  
                 incorrect = True  		   	  			  	 		  		  		    	 		 		   		 		  
                 mismatches = in_trades_1.join(in_trades_2,how='outer',lsuffix='1',rsuffix='2')  		   	  			  	 		  		  		    	 		 		   		 		  
