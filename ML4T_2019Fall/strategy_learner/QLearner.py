@@ -65,12 +65,14 @@ class QLearner(object):
         """  		   	  			  	 		  		  		    	 		 		   		 		  
         curr_actions = self.num_actions - 1
         self.s = s   	  			  	 		  		  		    	 		 		   		 		  
-        action = rand.randint(0, curr_actions) 
-        if rand.random() > self.rar:
+        #action = rand.randint(0, curr_actions) 
+        if rand.random() >= self.rar:
             action = np.argmax(self.q[s])
-        #self.rar = self.rar * self.radr
-        #self.a = action	   	  			  	 		  		  		    	 		 		   		 		  
-        if self.verbose: print(f"s = {s}, a = {action}")  		   	  			  	 		  		  		    	 		 		   		 		  
+        else:
+            action = rand.randint(0, curr_actions)
+        
+        self.rar = self.rar * self.radr
+        self.a = action	   	  			  	 		  		  		    	 		 		   		 		  
         return action  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
     def query(self,s_prime,r):  		   	  			  	 		  		  		    	 		 		   		 		  

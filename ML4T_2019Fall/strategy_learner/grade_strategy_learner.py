@@ -85,7 +85,8 @@ strategy_test_cases = [
         train_time=25,  		   	  			  	 		  		  		    	 		 		   		 		  
         test_time=5,  		   	  			  	 		  		  		    	 		 		   		 		  
         max_time=60,  		   	  			  	 		  		  		    	 		 		   		 		  
-        seed=1481090000  		   	  			  	 		  		  		    	 		 		   		 		  
+        #seed=1481090000
+        seed = 1021050103   		   	  			  	 		  		  		    	 		 		   		 		  
         ),  		   	  			  	 		  		  		    	 		 		   		 		  
     StrategyTestCase(  		   	  			  	 		  		  		    	 		 		   		 		  
         description="UNH - In sample",  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -218,7 +219,12 @@ def test_strategy(description, insample_args, outsample_args, benchmark_type, be
             #print(in_trades_1)
             #print(in_trades_2)
             #print("in_trades_1 {}".format(in_trades_1))
-            #print("in trades 2 {}".format(in_trades_2))	   	  			  	 		  		  		    	 		 		   		 		  
+            #print("in trades 2 {}".format(in_trades_2))
+            print(in_trades_1.index.equals(in_trades_2.index))
+            print(in_trades_1.index.difference(in_trades_2.index))
+            if description == "AAPL":
+                in_trades_1.to_csv("trades1.csv")
+                in_trades_2.to_csv("trades2.csv")  	  			  	 		  		  		    	 		 		   		 		  
             if not((in_trades_1 == in_trades_2).all()[0]):  		   	  			  	 		  		  		    	 		 		   		 		  
                 incorrect = True  		   	  			  	 		  		  		    	 		 		   		 		  
                 mismatches = in_trades_1.join(in_trades_2,how='outer',lsuffix='1',rsuffix='2')  		   	  			  	 		  		  		    	 		 		   		 		  

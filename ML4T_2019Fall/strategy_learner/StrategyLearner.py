@@ -88,10 +88,10 @@ class StrategyLearner(object):
         # example usage of the old backward compatible util function  		   	  			  	 		  		  		    	 		 		   		 		  
         syms=[symbol]  		   	  			  	 		  		  		    	 		 		   		 		  
         dates = pd.date_range(sd, ed)
-        val = 1481090000 #testing against provided unit tests  		   	  			  	 		  		  		    	 		 		   		 		  
+        #val = 1481090000 #testing against provided unit tests  		   	  			  	 		  		  		    	 		 		   		 		  
         prices_all = ut.get_data(syms, dates)  # automatically adds SPY  		   	  			  	 		  		  		    	 		 		   		 		  
         prices = prices_all[syms]  # only portfolio symbols  		   	  			  	 		  		  		    	 		 		   		 		  
-        random.seed(val) # testing
+        #random.seed(val) # testing
         prices_SPY = prices_all['SPY']  # only SPY, for comparison later  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(prices)  		   	  			  	 		  		  		    	 		 		   		 		  
   		   	  			  	 		  		  		    	 		 		   		 		  
@@ -193,7 +193,7 @@ class StrategyLearner(object):
         # here we build a fake set of trades  		   	  			  	 		  		  		    	 		 		   		 		  
         # your code should return the same sort of data  		   	  			  	 		  		  		    	 		 		   		 		  
         dates = pd.date_range(sd, ed)
-        val = 1481090000 #testing against provided unit tests		   	  			     	  			  	 		  		  		    	 		 		   		 		  
+        #val = 1481090000 #testing against provided unit tests		   	  			     	  			  	 		  		  		    	 		 		   		 		  
         prices_all = ut.get_data([symbol], dates)  # automatically adds SPY  		   	  			  	 		  		  		 
         trades = prices_all[[symbol,]]  # only portfolio symbols  		   	  			  	 		  		  		    	 		 		   		 		  
         trades_SPY = prices_all['SPY']  # only SPY, for comparison later  		   	  			  	 		  		  		    	 		 		   		 		  
@@ -204,7 +204,7 @@ class StrategyLearner(object):
         trades.values[60,:] = -2000 # go short from long  		   	  			  	 		  		  		    	 		 		   		 		  
         trades.values[61,:] = 2000 # go long from short  		   	  			  	 		  		  		    	 		 		   		 		  
         trades.values[-1,:] = -1000 #exit on the last day
-        random.seed(val) # testing		   	  			  	 		  		  		    	 		 		   		 		  
+        #random.seed(val) # testing		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(type(trades)) # it better be a DataFrame!  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(trades)  		   	  			  	 		  		  		    	 		 		   		 		  
         if self.verbose: print(prices_all)
@@ -221,6 +221,7 @@ class StrategyLearner(object):
         j = 0
         for index, row in feats.iterrows():
             action = self.q_l.querysetstate(int(float(feats.loc[index]['state'])))
+            #action = self.q_l.q[int(float(feats.loc[index]['state']))]
             if(action == 1):
                 if curr_shares == 0:
                     d = feats.index[j]
@@ -316,4 +317,8 @@ def compute_port_stats(portvals):
         return cumulative_return, avg_daily, std_daily, sharpe
 
 if __name__=="__main__":  		   	  			  	 		  		  		    	 		 		   		 		  
-    print("One does not simply think up a strategy")	  	 		  		  		    	 		 		   		 		  
+    sl = StrategyLearner()
+    trades, v_dates = sl.testPolicy(symbol="AAPL",sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,31),sv=100000)
+    trades2, v_dates2 = sl.testPolicy(symbol="AAPL",sd=dt.datetime(2008,1,1),ed=dt.datetime(2009,12,31),sv=100000)
+    #print(trades)
+    print(set(v_dates) - set(v_dates2))	  	 		  		  		    	 		 		   		 		  
